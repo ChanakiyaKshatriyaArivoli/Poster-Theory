@@ -33,8 +33,18 @@ async function startServer() {
   // Security headers
   const isProduction = process.env.NODE_ENV === 'production';
   app.use(helmet({
-    contentSecurityPolicy: isProduction ? undefined : false,
-    crossOriginEmbedderPolicy: isProduction,
+    contentSecurityPolicy: isProduction ? {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
+        connectSrc: ["'self'", "https://accounts.google.com"],
+        frameSrc: ["'self'", "https://accounts.google.com"],
+        fontSrc: ["'self'", "data:"],
+      },
+    } : false,
+    crossOriginEmbedderPolicy: false,
   }));
 
   // Disable X-Powered-By
