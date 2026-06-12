@@ -17,18 +17,14 @@ const pool = new Pool({
 });
 
 const initDB = async () => {
+  // In production, skip schema creation entirely — use production_reset.sql manually
+  if (process.env.NODE_ENV === 'production') {
+    console.log("Production mode — skipping schema creation");
+    return;
+  }
+
   try {
     const client = await pool.connect();
-
-    // In production, skip schema creation if tables already exist
-    if (process.env.NODE_ENV === 'production') {
-      const check = await client.query("SELECT to_regclass('public.users')");
-      if (check.rows[0].to_regclass) {
-        client.release();
-        console.log("Database already initialized — skipping schema creation");
-        return;
-      }
-    }
 
     // ─── Uncomment to reset DB (keeps users) ───
     // await client.query(`

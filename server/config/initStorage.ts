@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import pool from "./db.ts";
-import cloudinary from "./cloudinary.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,29 +21,9 @@ export const initStorage = async () => {
   try {
     const { rows } = await pool.query("SELECT slug FROM collections");
 
-    // Ensure local folders exist
+    // Always ensure local folders exist
     for (const row of rows) {
       ensureCollectionFolder(row.slug);
-    }
-
-    // Skip Cloudinary folder creation in production (already exists)
-    if (process.env.NODE_ENV !== 'production') {
-      const baseFolders = [
-        "poster-theory/products",
-        "poster-theory/custom",
-        "poster-theory/homepage",
-        "poster-theory/homepage/hero_images",
-        "poster-theory/homepage/collection_images",
-        "poster-theory/homepage/about_image",
-      ];
-
-      for (const folder of baseFolders) {
-        try { await cloudinary.api.create_folder(folder); } catch (_) {}
-      }
-
-      for (const row of rows) {
-        try { await cloudinary.api.create_folder(`poster-theory/products/${row.slug}`); } catch (_) {}
-      }
     }
 
     console.log(`Storage synced: ${rows.length} collections`);
