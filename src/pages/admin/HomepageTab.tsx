@@ -234,7 +234,7 @@ export default function HomepageTab({ token }: { token: string | null }) {
             </div>
           );
         })()}
-        {config.filter(c => !['collection_images', 'hero', 'featured', 'new_arrivals', 'trending', 'bestseller'].includes(c.section)).map(c => (
+        {config.filter(c => !['collection_images', 'featured', 'new_arrivals', 'trending', 'bestseller'].includes(c.section)).map(c => (
           <div key={c.section} className="border-2 border-z-border/20 p-5 bg-z-paper shadow-[4px_4px_0px_0px_var(--color-z-shadow)]">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-[11px] font-mono font-black uppercase text-z-ink">{c.section.replace(/_/g, ' ')}</h3>

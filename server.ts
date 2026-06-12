@@ -48,8 +48,10 @@ async function startServer() {
 
   // CSRF protection — double-submit cookie pattern
   // Skip for OAuth code exchange (secured by single-use DB code)
+  // Skip for cart sync (secured by JWT auth token)
   app.use((req, res, next) => {
     if (req.path === '/api/auth/google/exchange') return next();
+    if (req.path === '/api/profile/cart') return next();
     csrfProtection(req, res, next);
   });
 

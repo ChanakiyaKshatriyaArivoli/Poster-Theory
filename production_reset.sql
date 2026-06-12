@@ -321,11 +321,12 @@ END $$;
 INSERT INTO homepage_config (section, data) VALUES
   ('hero', '{"title": "Poster Theory", "subtitle": "Curated prints for your walls", "cta_text": "Shop Now", "cta_link": "/shop"}'),
   ('hero_images', '{"images": [{"url": "", "ref": "001//STILL_LIFE_VIBES"}, {"url": "", "ref": "002//SILK_CHROMATIC"}, {"url": "", "ref": "003//NEON_DREAMS"}, {"url": "", "ref": "004//STUDIO_GEOMETRIC"}]}'),
-  ('collection_images', '{"collections": [{"name": "Anime Archive", "img": "", "path": "/shop?collection=Anime"}, {"name": "F1 Syndicate", "img": "", "path": "/shop?collection=F1"}, {"name": "Music Gallery", "img": "", "path": "/shop?collection=Music"}, {"name": "Motorsports", "img": "", "path": "/shop?collection=Cars"}]}'),
+  ('collection_images', '{"collections": []}'),
   ('about_image', '{"url": ""}'),
   ('new_arrivals', '{"enabled": true, "limit": 8}'),
   ('trending', '{"enabled": true, "limit": 8}'),
-  ('featured', '{"enabled": true, "limit": 4}');
+  ('featured', '{"enabled": true, "limit": 4}'),
+  ('bestseller', '{"enabled": true, "limit": 8}');
 
 COMMIT;
 
