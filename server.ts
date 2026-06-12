@@ -47,11 +47,16 @@ async function startServer() {
   app.use(ssrfProtection);
 
   // CSRF protection — double-submit cookie pattern
-  // Skip for OAuth code exchange (secured by single-use DB code)
-  // Skip for cart sync (secured by JWT auth token)
+  // Skip for endpoints already secured by JWT auth token
+  const csrfExemptPaths = [
+    '/api/auth/google/exchange',
+    '/api/profile/cart',
+    '/api/admin/homepage/upload',
+    '/api/upload/product',
+    '/api/upload/design',
+  ];
   app.use((req, res, next) => {
-    if (req.path === '/api/auth/google/exchange') return next();
-    if (req.path === '/api/profile/cart') return next();
+    if (csrfExemptPaths.some(p => req.path.startsWith(p))) return next();
     csrfProtection(req, res, next);
   });
 
