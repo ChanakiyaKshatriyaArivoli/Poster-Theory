@@ -3,7 +3,6 @@ import rateLimit from "express-rate-limit";
 import { signup, login, getMe, verifyOtp, resendOtp, setPassword, forgotPassword, resetPassword, getAdminUsers } from "../controllers/authController.ts";
 import { googleAuthUrl, googleCallback, exchangeAuthCode } from "../controllers/googleAuthController.ts";
 import { authenticateToken, isAdmin } from "../middleware/authMiddleware.ts";
-import { csrfProtection } from "../middleware/csrf.ts";
 
 const router = express.Router();
 
@@ -23,14 +22,14 @@ const otpLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-router.post("/signup", csrfProtection, authLimiter, signup);
-router.post("/verify-otp", csrfProtection, otpLimiter, verifyOtp);
-router.post("/resend-otp", csrfProtection, otpLimiter, resendOtp);
-router.post("/login", csrfProtection, authLimiter, login);
+router.post("/signup", authLimiter, signup);
+router.post("/verify-otp", otpLimiter, verifyOtp);
+router.post("/resend-otp", otpLimiter, resendOtp);
+router.post("/login", authLimiter, login);
 router.get("/me", authenticateToken, getMe);
-router.post("/set-password", csrfProtection, authenticateToken, setPassword);
-router.post("/forgot-password", csrfProtection, otpLimiter, forgotPassword);
-router.post("/reset-password", csrfProtection, otpLimiter, resetPassword);
+router.post("/set-password", authenticateToken, setPassword);
+router.post("/forgot-password", otpLimiter, forgotPassword);
+router.post("/reset-password", otpLimiter, resetPassword);
 
 // Google OAuth
 router.get("/google", googleAuthUrl);

@@ -2,7 +2,6 @@ import express from "express";
 import multer from "multer";
 import { uploadProductImage, uploadDesignImage, deleteImage } from "../controllers/uploadController.ts";
 import { authenticateToken } from "../middleware/authMiddleware.ts";
-import { csrfProtection } from "../middleware/csrf.ts";
 
 const router = express.Router();
 
@@ -16,8 +15,8 @@ const upload = multer({
   },
 });
 
-router.post("/product", csrfProtection, authenticateToken, upload.single("image"), uploadProductImage);
-router.post("/design", csrfProtection, authenticateToken, upload.single("image"), uploadDesignImage);
-router.post("/delete", csrfProtection, authenticateToken, deleteImage);
+router.post("/product", authenticateToken, upload.single("image"), uploadProductImage);
+router.post("/design", authenticateToken, upload.single("image"), uploadDesignImage);
+router.post("/delete", authenticateToken, deleteImage);
 
 export default router;

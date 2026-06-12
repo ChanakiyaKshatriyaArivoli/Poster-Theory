@@ -1,7 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
 import { authenticateToken, isAdmin } from "../middleware/authMiddleware.ts";
-import { csrfProtection } from "../middleware/csrf.ts";
 import {
   getDashboard,
   getCollections, createCollection, updateCollection, deleteCollection,
@@ -27,8 +26,8 @@ const upload = multer({
   },
 });
 
-// All routes require admin + CSRF
-router.use(authenticateToken, isAdmin, csrfProtection);
+// All routes require admin auth
+router.use(authenticateToken, isAdmin);
 
 // Dashboard
 router.get("/dashboard", getDashboard);

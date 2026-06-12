@@ -46,20 +46,6 @@ async function startServer() {
   // SSRF protection — block internal URLs in request bodies
   app.use(ssrfProtection);
 
-  // CSRF protection — double-submit cookie pattern
-  // Skip for endpoints already secured by JWT auth token or rate limiting
-  const csrfExemptPrefixes = [
-    '/api/auth/',
-    '/api/profile/cart',
-    '/api/admin/homepage/upload',
-    '/api/upload/',
-    '/api/admin/products',
-  ];
-  app.use((req, res, next) => {
-    if (csrfExemptPrefixes.some(p => req.path.startsWith(p))) return next();
-    csrfProtection(req, res, next);
-  });
-
   // CSRF token endpoint (client fetches this on load)
   app.get("/api/csrf-token", getCsrfToken);
 

@@ -1,6 +1,5 @@
 import express from "express";
 import { authenticateToken } from "../middleware/authMiddleware.ts";
-import { csrfProtection } from "../middleware/csrf.ts";
 import {
   updateProfile,
   getAddresses,
@@ -15,14 +14,14 @@ import {
 
 const router = express.Router();
 
-router.put("/", csrfProtection, authenticateToken, updateProfile);
+router.put("/", authenticateToken, updateProfile);
 router.get("/check", authenticateToken, checkProfileComplete);
 router.get("/addresses", authenticateToken, getAddresses);
-router.post("/addresses", csrfProtection, authenticateToken, addAddress);
-router.put("/addresses/:id", csrfProtection, authenticateToken, updateAddress);
-router.delete("/addresses/:id", csrfProtection, authenticateToken, deleteAddress);
+router.post("/addresses", authenticateToken, addAddress);
+router.put("/addresses/:id", authenticateToken, updateAddress);
+router.delete("/addresses/:id", authenticateToken, deleteAddress);
 router.get("/cart", authenticateToken, getCart);
-router.post("/cart", csrfProtection, authenticateToken, saveCart);
-router.delete("/cart", csrfProtection, authenticateToken, clearCartDB);
+router.post("/cart", authenticateToken, saveCart);
+router.delete("/cart", authenticateToken, clearCartDB);
 
 export default router;
