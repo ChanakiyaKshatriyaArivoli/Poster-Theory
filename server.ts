@@ -31,19 +31,8 @@ async function startServer() {
   const PORT = 3000;
 
   // Security headers
-  const isProduction = process.env.NODE_ENV === 'production';
   app.use(helmet({
-    contentSecurityPolicy: isProduction ? {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
-        connectSrc: ["'self'", "https://accounts.google.com"],
-        frameSrc: ["'self'", "https://accounts.google.com"],
-        fontSrc: ["'self'", "data:"],
-      },
-    } : false,
+    contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
   }));
 
