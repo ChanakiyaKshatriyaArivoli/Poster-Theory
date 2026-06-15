@@ -54,7 +54,7 @@ export default function Cart() {
         if (missing.name) parts.push('name');
         if (missing.phone) parts.push('phone number');
         if (missing.address) parts.push('delivery address');
-        setProfileError(`Please complete your profile first: ${parts.join(', ')}. Go to Dashboard → Manage Profile / Addresses.`);
+        setProfileError(`Please complete your profile first: ${parts.join(', ')}. Go to Dashboard ? Manage Profile / Addresses.`);
         return;
       }
       await fetchAddresses();
@@ -101,9 +101,21 @@ export default function Cart() {
           </div>
           <h2 className="font-display font-black text-5xl uppercase tracking-tighter mb-4 text-z-ink">Order Confirmed!</h2>
           <p className="font-mono text-[12px] text-z-muted uppercase tracking-widest mb-2">ORDER REF: STUDIO-{orderId}</p>
-          <p className="font-mono text-[11px] text-z-muted uppercase mb-12">Your posters are being prepared for dispatch.</p>
+          <p className="font-mono text-[11px] text-z-muted uppercase mb-8">Your posters are being prepared for dispatch.</p>
+
+          {/* Cancellation Policy */}
+          <div className="text-left border-2 border-amber-400 bg-amber-50 p-5 mb-10">
+            <p className="text-[11px] font-mono font-black uppercase text-amber-800 mb-2">⚠ Cancellation Policy</p>
+            <ul className="text-[10px] font-mono text-amber-700 leading-relaxed space-y-1 list-disc pl-4">
+              <li>You can cancel your order before it enters <span className="font-black">In Production</span>.</li>
+              <li>Once production begins, cancellation is <span className="font-black">not available</span>.</li>
+              <li>For post-production issues, please contact our support team.</li>
+            </ul>
+            <p className="text-[10px] font-mono text-amber-700 mt-3">Support: <span className="font-black">support@postertheory.com</span></p>
+          </div>
+
           <div className="flex gap-4 justify-center">
-            <Link to="/dashboard" className="sticker-btn bg-z-ink text-white">View Orders</Link>
+            <Link to="/dashboard" className="sticker-btn bg-z-ink text-z-paper">View Orders</Link>
             <Link to="/shop" className="sticker-btn">Continue Shopping</Link>
           </div>
         </div>
@@ -122,7 +134,10 @@ export default function Cart() {
           </div>
           <h2 className="font-display font-black text-5xl uppercase tracking-tighter mb-4 text-z-ink">Your bag is empty.</h2>
           <p className="font-mono text-[13px] text-z-muted mb-12 uppercase font-bold tracking-widest leading-relaxed">Start your journey in our archive.</p>
-          <Link to="/shop" className="sticker-btn scale-110">Browse Posters</Link>
+          <div className="flex flex-col sm:flex-row gap-8 justify-center">
+            <Link to="/shop" className="sticker-btn scale-110">Browse Posters</Link>
+            <Link to="/customize" className="sticker-btn scale-110 bg-z-orange border-z-orange">Create Your Own</Link>
+          </div>
         </div>
       </div>
     );
@@ -155,11 +170,11 @@ export default function Cart() {
                         <div className="flex flex-col">
                           <h3 className="font-display font-black text-4xl uppercase tracking-tighter leading-none text-z-ink">{item.title}</h3>
                           <div className="mt-3 flex items-center flex-wrap gap-2">
-                            <span className="text-[11px] font-mono font-black uppercase text-white bg-z-ink px-3 py-1">SIZE: {item.size}</span>
+                            <span className="text-[11px] font-mono font-black uppercase text-z-paper bg-z-ink px-3 py-1">SIZE: {item.size}</span>
                             <span className="text-[11px] font-mono font-bold uppercase text-z-muted">COLLECTION: {item.collection}</span>
                           </div>
                         </div>
-                        <button onClick={() => removeFromCart(item.cartItemId)} className="bg-z-paper border-2 border-z-border p-3 text-z-ink hover:bg-black hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                        <button onClick={() => removeFromCart(item.cartItemId)} className="bg-z-paper border-2 border-z-border p-3 text-z-ink hover:bg-z-ink hover:text-z-paper transition-all shadow-[4px_4px_0px_0px_var(--color-z-shadow)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -176,10 +191,10 @@ export default function Cart() {
                     </div>
                     <div className="flex items-center space-x-6 mt-8 sm:mt-0">
                       <label className="text-[12px] font-mono uppercase text-z-muted font-black tracking-widest">Qty:</label>
-                      <div className="flex items-center border-2 border-z-border font-display font-bold text-base bg-z-paper shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                        <button onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)} className="px-8 py-3 hover:bg-black hover:text-white transition-all">-</button>
+                      <div className="flex items-center border-2 border-z-border font-display font-bold text-base bg-z-paper shadow-[4px_4px_0px_0px_var(--color-z-shadow)]">
+                        <button onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)} className="px-8 py-3 hover:bg-z-ink hover:text-z-paper transition-all">-</button>
                         <span className="px-8 py-3 border-x-2 border-z-border bg-z-paper">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)} className="px-8 py-3 hover:bg-black hover:text-white transition-all">+</button>
+                        <button onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)} className="px-8 py-3 hover:bg-z-ink hover:text-z-paper transition-all">+</button>
                       </div>
                     </div>
                   </div>
@@ -188,7 +203,7 @@ export default function Cart() {
             </div>
 
             <aside className="lg:col-span-4">
-              <div className="bg-z-paper p-10 border-2 border-z-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] sticky top-40">
+              <div className="bg-z-paper p-10 border-2 border-z-border shadow-[12px_12px_0px_0px_var(--color-z-shadow)] sticky top-40">
                 <div className="flex items-center space-x-3 mb-10 pb-4 border-b-2 border-z-border">
                   <CreditCard className="w-4 h-4 text-z-ink" />
                   <h2 className="text-[14px] font-display font-black uppercase tracking-widest text-z-ink">Summary</h2>
@@ -219,11 +234,11 @@ export default function Cart() {
                 {profileError && (
                   <div className="bg-red-50 border-2 border-red-300 p-4 text-[10px] font-mono font-bold uppercase text-red-700 mb-6">
                     {profileError}
-                    <Link to="/dashboard" className="block mt-3 sticker-btn bg-z-ink text-white text-center text-[10px] py-2">GO TO MANAGE PROFILE</Link>
+                    <Link to="/dashboard" className="block mt-3 sticker-btn bg-z-ink text-z-paper text-center text-[10px] py-2">GO TO MANAGE PROFILE</Link>
                   </div>
                 )}
 
-                <button onClick={handleProceedToAddress} className="w-full sticker-btn py-5 text-sm bg-z-ink text-white text-center">
+                <button onClick={handleProceedToAddress} className="w-full sticker-btn py-5 text-sm bg-z-ink text-z-paper text-center">
                   PROCEED TO CHECKOUT
                 </button>
               </div>
@@ -240,10 +255,10 @@ export default function Cart() {
             {addresses.length > 0 ? (
               <div className="space-y-4 mb-12">
                 {addresses.map(addr => (
-                  <label key={addr.id} className={`flex items-start gap-4 p-6 border-2 cursor-pointer transition-all ${selectedAddressId === addr.id ? 'border-z-ink bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]' : 'border-z-border hover:border-z-ink'}`}>
+                  <label key={addr.id} className={`flex items-start gap-4 p-6 border-2 cursor-pointer transition-all ${selectedAddressId === addr.id ? 'border-z-ink bg-z-paper shadow-[6px_6px_0px_0px_var(--color-z-shadow)]' : 'border-z-border hover:border-z-ink'}`}>
                     <input type="radio" name="address" checked={selectedAddressId === addr.id} onChange={() => setSelectedAddressId(addr.id)} className="mt-1 w-4 h-4" />
                     <div>
-                      <span className="text-[10px] font-mono font-black uppercase bg-z-ink text-white px-2 py-0.5">{addr.label}</span>
+                      <span className="text-[10px] font-mono font-black uppercase bg-z-ink text-z-paper px-2 py-0.5">{addr.label}</span>
                       <p className="text-sm font-display font-bold text-z-ink mt-2">{addr.line1}{addr.line2 ? `, ${addr.line2}` : ''}</p>
                       <p className="text-[11px] font-mono text-z-muted uppercase">{addr.city}, {addr.state} - {addr.pincode}</p>
                     </div>
@@ -253,12 +268,12 @@ export default function Cart() {
             ) : (
               <div className="text-center py-12 border-2 border-dashed border-z-border mb-12">
                 <p className="font-display font-black text-xl uppercase text-z-muted italic mb-4">No addresses found</p>
-                <Link to="/dashboard" className="sticker-btn bg-z-ink text-white inline-block">Add Address in Dashboard</Link>
+                <Link to="/dashboard" className="sticker-btn bg-z-ink text-z-paper inline-block">Add Address in Dashboard</Link>
               </div>
             )}
             <div className="flex gap-4">
-              <button onClick={() => setStep('cart')} className="px-8 py-4 border-2 border-z-border font-display font-bold uppercase hover:bg-z-ink hover:text-white transition-all">Back</button>
-              <button onClick={() => setStep('confirm')} disabled={!selectedAddressId} className="sticker-btn py-4 bg-z-ink text-white flex-1 text-center">
+              <button onClick={() => setStep('cart')} className="px-8 py-4 border-2 border-z-border font-display font-bold uppercase hover:bg-z-ink hover:text-z-paper transition-all">Back</button>
+              <button onClick={() => setStep('confirm')} disabled={!selectedAddressId} className="sticker-btn py-4 bg-z-ink text-z-paper flex-1 text-center">
                 Review Order
               </button>
             </div>
@@ -268,7 +283,7 @@ export default function Cart() {
         {step === 'confirm' && (
           <div className="max-w-2xl mx-auto">
             <div className="space-y-8">
-              <div className="border-2 border-z-border p-8 bg-white">
+              <div className="border-2 border-z-border p-8 bg-z-paper">
                 <h3 className="text-[11px] font-mono font-black uppercase tracking-widest mb-6 border-b-2 border-z-border pb-4">Order Items ({cart.length})</h3>
                 <div className="space-y-4">
                   {cart.map(item => (
@@ -286,13 +301,13 @@ export default function Cart() {
                 </div>
               </div>
 
-              <div className="border-2 border-z-border p-8 bg-white">
+              <div className="border-2 border-z-border p-8 bg-z-paper">
                 <h3 className="text-[11px] font-mono font-black uppercase tracking-widest mb-4 border-b-2 border-z-border pb-4">Delivering To</h3>
                 {(() => {
                   const addr = addresses.find(a => a.id === selectedAddressId);
                   return addr ? (
                     <div>
-                      <span className="text-[10px] font-mono font-black uppercase bg-z-ink text-white px-2 py-0.5">{addr.label}</span>
+                      <span className="text-[10px] font-mono font-black uppercase bg-z-ink text-z-paper px-2 py-0.5">{addr.label}</span>
                       <p className="text-sm font-display font-bold mt-2">{addr.line1}{addr.line2 ? `, ${addr.line2}` : ''}</p>
                       <p className="text-[11px] font-mono text-z-muted uppercase">{addr.city}, {addr.state} - {addr.pincode}</p>
                     </div>
@@ -300,16 +315,24 @@ export default function Cart() {
                 })()}
               </div>
 
-              <div className="border-2 border-z-ink p-8 bg-z-ink text-white">
+              <div className="border-2 border-z-ink p-8 bg-z-ink text-z-paper">
                 <div className="flex justify-between items-baseline">
                   <span className="font-display font-black text-2xl uppercase">Total</span>
                   <span className="font-display font-black text-4xl italic">₹{total.toLocaleString()}</span>
                 </div>
               </div>
 
+              {/* Cancellation Policy Notice */}
+              <div className="border-2 border-amber-400 bg-amber-50 p-5">
+                <p className="text-[11px] font-mono font-black uppercase text-amber-800 mb-2">⚠ Cancellation Policy</p>
+                <p className="text-[10px] font-mono text-amber-700 leading-relaxed">
+                  You can cancel your order only before it enters production. Once the order status moves to "In Production", cancellation is no longer available. For post-production issues, please contact our support team.
+                </p>
+              </div>
+
               <div className="flex gap-4">
-                <button onClick={() => setStep('address')} className="px-8 py-4 border-2 border-z-border font-display font-bold uppercase hover:bg-z-ink hover:text-white transition-all">Back</button>
-                <button onClick={handleConfirmOrder} disabled={loading} className="sticker-btn py-4 bg-z-ink text-white flex-1 text-center text-lg">
+                <button onClick={() => setStep('address')} className="px-8 py-4 border-2 border-z-border font-display font-bold uppercase hover:bg-z-ink hover:text-z-paper transition-all">Back</button>
+                <button onClick={handleConfirmOrder} disabled={loading} className="sticker-btn py-4 bg-z-ink text-z-paper flex-1 text-center text-lg">
                   {loading ? 'PLACING ORDER...' : 'PLACE ORDER'}
                 </button>
               </div>
@@ -320,5 +343,6 @@ export default function Cart() {
     </div>
   );
 }
+
 
 

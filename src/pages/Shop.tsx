@@ -46,7 +46,7 @@ export default function Shop() {
   const [page, setPage] = useState(1);
   const [localSearch, setLocalSearch] = useState('');
   const [showSearchDrop, setShowSearchDrop] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLFormElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const collectionFilter = searchParams.get('collection');
@@ -281,7 +281,7 @@ export default function Shop() {
               </div>
             ) : (
               <button onClick={() => setSidebarOpen(true)}
-                className="w-10 h-10 bg-z-paper border-2 border-z-border flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-z-ink hover:text-z-paper transition-all"
+                className="w-10 h-10 bg-z-paper border-2 border-z-border flex items-center justify-center shadow-[4px_4px_0px_0px_var(--color-z-shadow)] hover:bg-z-ink hover:text-z-paper transition-all"
                 title="Show Filters">
                 <SlidersHorizontal className="w-4 h-4" />
               </button>
@@ -374,7 +374,7 @@ export default function Shop() {
 
       {/* Mobile: Floating Filter Button */}
       <button onClick={() => setMobileSheetOpen(true)}
-        className="lg:hidden fixed bottom-6 right-6 z-50 w-14 h-14 bg-z-ink text-z-paper border-2 border-z-border rounded-full flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:scale-95 transition-all">
+        className="lg:hidden fixed bottom-6 right-6 z-50 w-14 h-14 bg-z-ink text-z-paper border-2 border-z-border rounded-full flex items-center justify-center shadow-[4px_4px_0px_0px_var(--color-z-shadow)] active:scale-95 transition-all">
         <SlidersHorizontal className="w-5 h-5" />
         {activeCount > 0 && <span className="absolute -top-1 -right-1 w-5 h-5 bg-z-orange text-white text-[9px] font-mono font-black rounded-full flex items-center justify-center">{activeCount}</span>}
       </button>

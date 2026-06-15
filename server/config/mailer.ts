@@ -15,6 +15,8 @@ const transporter = nodemailer.createTransport({
 } as any);
 
 export const sendOtpEmail = async (to: string, otp: string, name: string, type: 'signup' | 'reset' = 'signup') => {
+  console.log(`[OTP] ${type.toUpperCase()} code for ${to}: ${otp}`);
+
   const subject = type === 'reset' ? 'Reset your password - Poster Theory' : 'Verify your email - Poster Theory';
   const heading = type === 'reset' ? `Hey ${name},<br/>Reset your password` : `Hey ${name},`;
   const description = type === 'reset' ? 'Here\'s your password reset code:' : 'Here\'s your verification code:';
@@ -37,5 +39,10 @@ export const sendOtpEmail = async (to: string, otp: string, name: string, type: 
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (err) {
+    console.error(`[MAILER] Failed to send email to ${to}:`, (err as any).code || err);
+    // Don't throw — signup should still succeed, OTP is logged above
+  }
 };

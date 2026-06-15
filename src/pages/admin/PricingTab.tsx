@@ -16,17 +16,23 @@ export default function PricingTab({ token }: { token: string | null }) {
   const [newLayout, setNewLayout] = useState({ name: '', panel_count: '' });
   const [editLayout, setEditLayout] = useState<{ id: number; name: string; panel_count: string } | null>(null);
 
+  const [couriers, setCouriers] = useState<any[]>([]);
+  const [newCourier, setNewCourier] = useState({ name: '', tracking_url: '' });
+  const { loading: courierLoading, run: runCourier } = useAction();
+
   const reload = async () => {
-    const [p, s, l, c] = await Promise.all([
+    const [p, s, l, c, cr] = await Promise.all([
       api.get('/api/admin/pricing', h(token)),
       api.get('/api/admin/sizes', h(token)),
       api.get('/api/admin/layouts', h(token)),
       api.get('/api/admin/collections', h(token)),
+      api.get('/api/admin/couriers', h(token)),
     ]);
     setPricing(Array.isArray(p.data) ? p.data : []);
     setSizes(Array.isArray(s.data) ? s.data : []);
     setLayouts(Array.isArray(l.data) ? l.data : []);
     setCollections(Array.isArray(c.data) ? c.data : []);
+    setCouriers(Array.isArray(cr.data) ? cr.data : []);
   };
 
   useEffect(() => { reload().catch(() => {}); }, []);
@@ -349,6 +355,46 @@ export default function PricingTab({ token }: { token: string | null }) {
             <input value={newSize.margin_right} onChange={e => setNewSize({...newSize, margin_right: e.target.value.replace(/\D/g, '')})} placeholder="10" className={`w-12 ${inputClsLg} text-center`} />
           </div>
           <button onClick={addSize} disabled={sizeLoading} className={addBtnClsLg}>{sizeLoading ? <Spinner /> : <><Plus className="w-4 h-4" /> Add Size</>}</button>
+        </div>
+      </div>
+
+      {/* Couriers */}
+      <div className="border-2 border-z-border/20 p-6 bg-z-paper shadow-[4px_4px_0px_0px_var(--color-z-shadow)]">
+        <h3 className="text-[12px] font-mono font-black uppercase tracking-widest text-z-ink mb-5 border-b-2 border-z-orange/30 pb-3 flex items-center gap-2">
+          <Tag className="w-4 h-4 text-z-orange" /> Couriers <span className="text-z-orange">({couriers.length})</span> {courierLoading && <Spinner />}
+        </h3>
+        <p className="text-[10px] font-mono text-z-muted mb-4">Tracking URL must contain <code className="bg-z-ink/10 px-1">{'{tracking_id}'}</code> as placeholder. Example: https://www.delhivery.com/track/package/{'{tracking_id}'}</p>
+        <div className="space-y-2 mb-5 max-h-64 overflow-y-auto">
+          {couriers.map(c => (
+            <div key={c.id} className="flex justify-between items-center text-[12px] font-mono py-2.5 px-3 border border-z-border/10 hover:border-z-orange/30 transition-all group bg-z-paper rounded-sm">
+              <div>
+                <span className="font-bold text-z-ink">{c.name}</span>
+                <span className="text-z-muted text-[10px] ml-3 truncate max-w-[300px] inline-block align-bottom">{c.tracking_url}</span>
+              </div>
+              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={async () => { await runCourier(async () => { await api.put(`/api/admin/couriers/${c.id}`, { is_active: !c.is_active }, h(token)); await reload(); }); }}
+                  className={`px-2 py-1 text-[9px] font-mono font-black uppercase border transition-all ${c.is_active ? 'border-green-400 text-green-600' : 'border-red-300 text-red-500'}`}>
+                  {c.is_active ? 'Active' : 'Inactive'}
+                </button>
+                <button onClick={async () => { await runCourier(async () => { await api.delete(`/api/admin/couriers/${c.id}`, h(token)); await reload(); }); }} disabled={courierLoading} className={`${iconBtnCls} disabled:opacity-50`}>
+                  <Trash2 className="w-4 h-4 text-red-500" />
+                </button>
+              </div>
+            </div>
+          ))}
+          {couriers.length === 0 && <p className="text-[11px] font-mono text-z-muted italic text-center py-4">No couriers added yet</p>}
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <input value={newCourier.name} onChange={e => setNewCourier({...newCourier, name: e.target.value})} placeholder="Courier name (e.g. Delhivery)" className={`w-48 ${inputClsLg}`} />
+          <input value={newCourier.tracking_url} onChange={e => setNewCourier({...newCourier, tracking_url: e.target.value})} placeholder="https://track.example.com/{tracking_id}" className={`flex-1 min-w-[200px] ${inputClsLg}`} />
+          <button onClick={async () => {
+            if (!newCourier.name || !newCourier.tracking_url) return;
+            await runCourier(async () => {
+              await api.post('/api/admin/couriers', newCourier, h(token));
+              setNewCourier({ name: '', tracking_url: '' });
+              await reload();
+            });
+          }} disabled={courierLoading} className={addBtnClsLg}>{courierLoading ? <Spinner /> : <><Plus className="w-4 h-4" /> Add</>}</button>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ShieldAlert, LayoutDashboard, Image, Package, DollarSign, Ticket, Users, Home } from 'lucide-react';
+import { ShieldAlert, LayoutDashboard, Image, Package, DollarSign, Ticket, Users, Home, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import DashboardTab from './admin/DashboardTab';
@@ -10,8 +10,9 @@ import PricingTab from './admin/PricingTab';
 import CouponsTab from './admin/CouponsTab';
 import CustomersTab from './admin/CustomersTab';
 import HomepageTab from './admin/HomepageTab';
+import AnalyticsTab from './admin/AnalyticsTab';
 
-type Tab = 'dashboard' | 'posters' | 'orders' | 'pricing' | 'coupons' | 'customers' | 'homepage';
+type Tab = 'dashboard' | 'posters' | 'orders' | 'pricing' | 'coupons' | 'customers' | 'homepage' | 'analytics';
 
 export default function Admin() {
   const { user, token } = useAuth();
@@ -35,6 +36,7 @@ export default function Admin() {
     { id: 'coupons', label: 'Coupons', icon: <Ticket className="w-4 h-4" /> },
     { id: 'customers', label: 'Customers', icon: <Users className="w-4 h-4" /> },
     { id: 'homepage', label: 'Homepage', icon: <Home className="w-4 h-4" /> },
+    { id: 'analytics', label: 'Analytics', icon: <BarChart3 className="w-4 h-4" /> },
   ];
 
   return (
@@ -67,6 +69,7 @@ export default function Admin() {
         {activeTab === 'coupons' && <CouponsTab token={token} />}
         {activeTab === 'customers' && <CustomersTab token={token} />}
         {activeTab === 'homepage' && <HomepageTab token={token} />}
+        {activeTab === 'analytics' && <AnalyticsTab token={token} />}
       </div>
     </div>
   );

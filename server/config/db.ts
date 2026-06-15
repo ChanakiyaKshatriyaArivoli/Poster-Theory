@@ -227,6 +227,24 @@ const initDB = async () => {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(order_id, item_index)
       );
+
+      CREATE TABLE IF NOT EXISTS page_visits (
+        id SERIAL PRIMARY KEY,
+        page TEXT NOT NULL,
+        user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        ip TEXT DEFAULT '',
+        user_agent TEXT DEFAULT '',
+        referrer TEXT DEFAULT '',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS couriers (
+        id SERIAL PRIMARY KEY,
+        name TEXT UNIQUE NOT NULL,
+        tracking_url TEXT NOT NULL,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
     // ─── DEV SEED: Disabled for production ───
@@ -240,6 +258,8 @@ const initDB = async () => {
       ALTER TABLE products ADD COLUMN IF NOT EXISTS orientation TEXT DEFAULT 'portrait';
       ALTER TABLE products ADD COLUMN IF NOT EXISTS image_folder TEXT DEFAULT '';
       ALTER TABLE products ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT '{}';
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS courier_name TEXT DEFAULT '';
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS tracking_id TEXT DEFAULT '';
     `).catch(() => {});
 
     client.release();

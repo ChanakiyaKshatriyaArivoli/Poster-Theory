@@ -137,7 +137,7 @@ export default function Home() {
             <div className="flex gap-6 animate-marquee-scroll hover:[animation-play-state:paused] md:[animation-play-state:running] [animation-play-state:paused] md:animate-marquee-scroll overflow-x-auto md:overflow-visible scrollbar-hide px-6 md:px-0">
               {[...collections, ...collections].map((cat, idx) => (
                 <Link key={idx} to={cat.path} className="snap-center min-w-[140px] sm:min-w-[180px] flex flex-col items-center shrink-0 group/card">
-                  <div className="w-32 sm:w-40 aspect-[210/297] overflow-hidden border-2 border-z-border group-hover/card:border-z-ink transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover/card:shadow-none group-hover/card:translate-x-[2px] group-hover/card:translate-y-[2px]">
+                  <div className="w-32 sm:w-40 aspect-[210/297] overflow-hidden border-2 border-z-border group-hover/card:border-z-ink transition-all shadow-[4px_4px_0px_0px_var(--color-z-shadow)] group-hover/card:shadow-none group-hover/card:translate-x-[2px] group-hover/card:translate-y-[2px]">
                     {cat.img ? (
                       <img src={cat.img} alt={cat.name} loading="lazy" className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" />
                     ) : (

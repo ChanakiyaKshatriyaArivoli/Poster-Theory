@@ -13,17 +13,23 @@ export default function DashboardTab({ token }: { token: string | null }) {
     { label: 'Revenue', value: `₹${data.totalRevenue?.toLocaleString()}` },
     { label: 'This Month', value: data.ordersThisMonth },
     { label: 'Pending', value: data.pendingOrders },
-    { label: 'Completed', value: data.completedOrders },
-    { label: 'Custom Requests', value: data.customRequests },
+    { label: 'Delivered', value: data.completedOrders },
+    { label: 'Cancelled', value: data.cancelledOrders },
+    { label: 'Custom Prints', value: data.customRequests },
   ];
 
   return (
     <div>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-10">
         {stats.map((s, i) => (
           <div key={s.label} className="bg-z-paper border-2 border-z-border/20 p-4 shadow-[4px_4px_0px_0px_var(--color-z-shadow)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
             <p className="text-[9px] font-mono uppercase tracking-widest text-z-muted font-black">{s.label}</p>
-            <p className={`font-display font-black text-2xl mt-1 ${i === 1 ? 'text-z-orange' : 'text-z-ink'}`}>{s.value}</p>
+            <p className={`font-display font-black text-2xl mt-1 ${
+              s.label === 'Revenue' ? 'text-z-orange' :
+              s.label === 'Cancelled' ? 'text-red-500' :
+              s.label === 'Delivered' ? 'text-green-600' :
+              'text-z-ink'
+            }`}>{s.value}</p>
           </div>
         ))}
       </div>
@@ -31,7 +37,7 @@ export default function DashboardTab({ token }: { token: string | null }) {
       <h3 className="font-display font-black text-lg uppercase tracking-tighter text-z-ink mb-4">Recent Orders</h3>
       <div className="border-2 border-z-border/20 overflow-x-auto">
         <table className="w-full text-[13px] font-mono">
-          <thead><tr className="bg-z-ink text-z-paper dark:bg-z-orange dark:text-white">
+          <thead><tr className="bg-z-ink text-z-paper">
             <th className="px-3 py-2 text-left uppercase">ID</th>
             <th className="px-3 py-2 text-left uppercase">Customer</th>
             <th className="px-3 py-2 text-left uppercase">Total</th>

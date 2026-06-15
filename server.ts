@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-dotenv.config({ path: '.env.local' });
 dotenv.config();
 
 import express from "express";
@@ -21,6 +20,7 @@ import profileRoutes from "./server/routes/profile.ts";
 import uploadRoutes from "./server/routes/upload.ts";
 import exportRoutes from "./server/routes/export.ts";
 import adminRoutes from "./server/routes/admin.ts";
+import { trackVisit } from "./server/controllers/analyticsController.ts";
 import { initStorage } from "./server/config/initStorage.ts";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -60,6 +60,9 @@ async function startServer() {
   app.use("/api/upload", uploadRoutes);
   app.use("/api/export", exportRoutes);
   app.use("/api/admin", adminRoutes);
+
+  // Public analytics tracking
+  app.post("/api/track-visit", trackVisit);
 
   // Serve Uploads
   app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));

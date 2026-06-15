@@ -6,6 +6,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import { usePageTracker } from './hooks/usePageTracker';
 
 // Pages
 import Home from './pages/Home';
@@ -37,6 +38,8 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 function AppContent() {
+  usePageTracker();
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />

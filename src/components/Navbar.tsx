@@ -20,7 +20,7 @@ export default function Navbar() {
   const [searchProducts, setSearchProducts] = useState<any[]>([]);
   const [showSearchDrop, setShowSearchDrop] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const searchRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLFormElement>(null);
   const location = useLocation();
   const hideSearch = ['/admin', '/customize', '/story'].includes(location.pathname);
 
@@ -198,7 +198,7 @@ export default function Navbar() {
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className="flex items-center space-x-2 text-z-ink group"
             >
-              <div className={`border-2 border-z-border p-2 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none translate-x-0 hover:translate-x-[2px] hover:translate-y-[2px] ${userMenuOpen ? 'bg-z-ink text-z-paper' : 'bg-z-paper hover:bg-z-ink hover:text-z-paper'}`}>
+              <div className={`border-2 border-z-border p-2 transition-all shadow-[4px_4px_0px_0px_var(--color-z-shadow)] hover:shadow-none translate-x-0 hover:translate-x-[2px] hover:translate-y-[2px] ${userMenuOpen ? 'bg-z-ink text-z-paper' : 'bg-z-paper hover:bg-z-ink hover:text-z-paper'}`}>
                 <User className="w-4 h-4" />
               </div>
             </button>
@@ -275,7 +275,7 @@ export default function Navbar() {
         <div className="lg:hidden flex items-center space-x-4">
           <button 
             onClick={toggleTheme}
-            className="p-2 border-2 border-z-border bg-z-paper text-z-ink hover:bg-z-ink hover:text-z-paper transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+            className="p-2 border-2 border-z-border bg-z-paper text-z-ink hover:bg-z-ink hover:text-z-paper transition-all shadow-[2px_2px_0px_0px_var(--color-z-shadow)]"
           >
             {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
           </button>
@@ -284,7 +284,7 @@ export default function Navbar() {
             <motion.div 
               key={totalQuantity}
               animate={totalQuantity > 0 ? { scale: [1, 1.3, 1] } : {}}
-              className="bg-z-paper border-2 border-z-border p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] "
+              className="bg-z-paper border-2 border-z-border p-2 shadow-[2px_2px_0px_0px_var(--color-z-shadow)] "
             >
               <ShoppingBag className="w-4 h-4 text-z-ink" />
             </motion.div>
@@ -296,7 +296,7 @@ export default function Navbar() {
           </Link>
           <button 
             onClick={() => setIsOpen(!isOpen)} 
-            className={`p-2 border-2 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${isOpen ? 'bg-z-ink text-z-paper border-z-ink shadow-none translate-x-[1px] translate-y-[1px]' : 'bg-z-paper text-z-ink border-z-border'}`}
+            className={`p-2 border-2 transition-all shadow-[2px_2px_0px_0px_var(--color-z-shadow)] ${isOpen ? 'bg-z-ink text-z-paper border-z-ink shadow-none translate-x-[1px] translate-y-[1px]' : 'bg-z-paper text-z-ink border-z-border'}`}
           >
             {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>

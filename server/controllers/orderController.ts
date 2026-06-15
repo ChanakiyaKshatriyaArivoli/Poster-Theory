@@ -82,7 +82,7 @@ export const createOrder = async (req: any, res: Response) => {
 
     const { rows } = await pool.query(
       "INSERT INTO orders (user_id, total, status, items, address_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [user_id, serverTotal, "confirmed", JSON.stringify(processedItems), address_id]
+      [user_id, serverTotal, "order_placed", JSON.stringify(processedItems), address_id]
     );
 
     res.status(201).json(rows[0]);
@@ -93,12 +93,15 @@ export const createOrder = async (req: any, res: Response) => {
 };
 
 export const getUserOrders = async (req: any, res: Response) => {
-  const user_id = req.user.id; // Always use authenticated user's ID to prevent IDOR
+  const user_id = req.user.id;
   try {
     const { rows } = await pool.query(
-      `SELECT orders.*, addresses.line1, addresses.city, addresses.pincode, addresses.label as addr_label 
-       FROM orders LEFT JOIN addresses ON orders.address_id = addresses.id 
-       WHERE orders.user_id = $1 ORDER BY orders.created_at DESC`,
+      `SELECT o.*, a.line1, a.city, a.pincode, a.label as addr_label,
+        cr.tracking_url as courier_tracking_url
+       FROM orders o
+       LEFT JOIN addresses a ON o.address_id = a.id
+       LEFT JOIN couriers cr ON cr.name = o.courier_name
+       WHERE o.user_id = $1 ORDER BY o.created_at DESC`,
       [user_id]
     );
     res.json(rows);
@@ -194,6 +197,33 @@ export const downloadOrder = async (req: any, res: Response) => {
 };
 
 // ========== ITEM TRACKING ==========
+
+// Client cancel order
+export const cancelOrder = async (req: any, res: Response) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const result = await pool.query("SELECT id, status, user_id FROM orders WHERE id = $1", [id]);
+    const order = result.rows[0];
+    if (!order) return res.status(404).json({ error: "Order not found" });
+    if (order.user_id !== userId) return res.status(403).json({ error: "Not authorized" });
+
+    const nonCancellable = ['in_production', 'printed', 'ready_to_ship', 'out_for_delivery', 'delivered', 'cancelled'];
+    if (nonCancellable.includes(order.status)) {
+      return res.status(400).json({ error: "Order cannot be cancelled at this stage. Please contact support for assistance." });
+    }
+
+    await pool.query("UPDATE orders SET status = 'cancelled', updated_at = NOW() WHERE id = $1", [id]);
+    await pool.query("INSERT INTO order_status_history (order_id, status, note) VALUES ($1, 'cancelled', 'Cancelled by customer')", [id]);
+
+    res.json({ message: "Order cancelled successfully" });
+  } catch (err) {
+    console.error("Cancel order error:", err);
+    res.status(500).json({ error: "Failed to cancel order" });
+  }
+};
+
 export const getItemTracking = async (req: any, res: Response) => {
   const { id } = req.params;
   try {

@@ -28,7 +28,7 @@ export default function Story() {
             </p>
           </div>
 
-          <div className="polaroid aspect-[16/9] bg-z-paper overflow-hidden shadow-[24px_24px_0px_0px_rgba(0,0,0,1)]">
+          <div className="polaroid aspect-[16/9] bg-z-paper overflow-hidden shadow-[24px_24px_0px_0px_var(--color-z-shadow)]">
              <img 
                src="https://picsum.photos/seed/story-workshop/1600/900" 
                alt="Workshop" 

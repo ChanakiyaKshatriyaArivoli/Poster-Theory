@@ -20,14 +20,16 @@ export const h = (t: string | null) => ({ headers: { Authorization: `Bearer ${t}
 // Shared UI components
 export function StatusBadge({ status }: { status: string }) {
   const labels: Record<string, string> = {
-    new_order: 'Order Placed',
-    design_ready: 'Design Ready',
-    printing: 'In Production',
-    packed: 'Ready to Ship',
-    shipped: 'Out for Delivery',
+    order_placed: 'Order Placed',
+    verified: 'Verified',
+    in_production: 'In Production',
+    printed: 'Printed',
+    ready_to_ship: 'Ready to Ship',
+    out_for_delivery: 'Out for Delivery',
     delivered: 'Delivered',
+    cancelled: 'Cancelled',
   };
-  return <span className="px-2 py-0.5 text-[8px] font-mono font-black uppercase bg-z-ink text-white">{labels[status] || status.replace(/_/g, ' ')}</span>;
+  return <span className="px-2 py-0.5 text-[8px] font-mono font-black uppercase bg-z-ink text-z-paper">{labels[status] || status.replace(/_/g, ' ')}</span>;
 }
 
 export function MicroBadge({ children, red }: { children: React.ReactNode; red?: boolean }) {

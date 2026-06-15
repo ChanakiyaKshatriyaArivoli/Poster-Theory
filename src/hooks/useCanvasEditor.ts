@@ -372,7 +372,7 @@ export function useCanvasEditor() {
     panelLines.forEach(o => o.set('visible', true));
     canvas.renderAll();
 
-    const sanitized = (activePage.fileName || 'print').replace(/[^a-zA-Z0-9_\-. ]/g, '').replace(/\.[^.]+$/, '').slice(0, 80) || 'print';
+    const sanitized = (activePage.fileName || 'print').replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\.\./g, '').trim().slice(0, 80) || 'print';
 
     // Single panel — direct PNG download
     if (activePage.panelCount <= 1) {

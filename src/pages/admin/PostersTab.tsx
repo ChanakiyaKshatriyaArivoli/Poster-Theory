@@ -122,7 +122,7 @@ export default function PostersTab({ token }: { token: string | null }) {
     setSubmitting(false);
   };
 
-  const openEdit = (product: any) => {
+  const openEdit = async (product: any) => {
     setSelected(product);
     setEditForm({
       title: product.title || '',
@@ -137,7 +137,13 @@ export default function PostersTab({ token }: { token: string | null }) {
       is_trending: !!product.is_trending,
       is_new_arrival: !!product.is_new_arrival,
       is_bestseller: !!product.is_bestseller,
+      totalOrdered: null as number | null,
     });
+    // Fetch order stats for this product
+    try {
+      const res = await api.get(`/api/admin/products/${product.id}/stats`, h(token));
+      setEditForm((prev: any) => prev ? { ...prev, totalOrdered: res.data.totalOrdered } : prev);
+    } catch {}
   };
 
   const handleUpdate = async () => {
@@ -388,7 +394,7 @@ export default function PostersTab({ token }: { token: string | null }) {
                 ))}
               </div>
               {/* Upload new images */}
-              <label className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 bg-z-ink text-white text-[11px] font-mono font-black uppercase cursor-pointer hover:opacity-80 transition-all active:scale-95">
+              <label className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 bg-z-ink text-z-paper text-[11px] font-mono font-black uppercase cursor-pointer hover:opacity-80 transition-all active:scale-95">
                 <Upload className="w-3.5 h-3.5" /> Add Images
                 <input type="file" accept="image/*" multiple className="hidden" onChange={async (e) => {
                   const files = Array.from(e.target.files || []);
@@ -406,6 +412,14 @@ export default function PostersTab({ token }: { token: string | null }) {
             </div>
 
             <h3 className="text-[13px] font-mono font-black uppercase tracking-widest text-z-ink mb-5 pb-3 border-b-2 border-z-orange/30">Edit Poster</h3>
+
+            {/* Total Ordered Stats */}
+            <div className="mb-5 p-3 border-2 border-z-orange/20 bg-z-orange/5">
+              <p className="text-[9px] font-mono uppercase tracking-widest text-z-muted font-black">Total Ordered</p>
+              <p className="font-display font-black text-2xl text-z-orange">
+                {editForm.totalOrdered !== null ? editForm.totalOrdered : '...'}
+              </p>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
               <Input label="Title" value={editForm.title} onChange={v => setEditForm({...editForm, title: v})} required />

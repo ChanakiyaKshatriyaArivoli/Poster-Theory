@@ -32,20 +32,23 @@ const sanitizeText = (val: any, maxLen = 500): string => {
 // ========== DASHBOARD ==========
 export const getDashboard = async (req: Request, res: Response) => {
   try {
-    const [totalOrders, revenue, monthOrders, pending, completed, customRequests] = await Promise.all([
+    const [totalOrders, revenue, monthOrders, pending, completed, customRequests, cancelled, inProcess] = await Promise.all([
       pool.query("SELECT COUNT(*) FROM orders"),
-      pool.query("SELECT COALESCE(SUM(total), 0) as total FROM orders"),
+      pool.query("SELECT COALESCE(SUM(total), 0) as total FROM orders WHERE status != 'cancelled'"),
       pool.query("SELECT COUNT(*) FROM orders WHERE created_at >= date_trunc('month', CURRENT_DATE)"),
-      pool.query("SELECT COUNT(*) FROM orders WHERE status IN ('new_order', 'design_ready', 'printing')"),
+      pool.query("SELECT COUNT(*) FROM orders WHERE status IN ('order_placed', 'verified')"),
       pool.query("SELECT COUNT(*) FROM orders WHERE status = 'delivered'"),
-      pool.query("SELECT COUNT(*) FROM custom_requests"),
+      pool.query("SELECT COALESCE(SUM(COALESCE((item->>'quantity')::int, 1)), 0) as count FROM orders o, jsonb_array_elements(o.items) as item WHERE item->'customSpecs' IS NOT NULL AND o.status != 'cancelled'"),
+      pool.query("SELECT COUNT(*) FROM orders WHERE status = 'cancelled'"),
+      pool.query("SELECT COUNT(*) FROM orders WHERE status IN ('in_production', 'printed', 'ready_to_ship')"),
     ]);
 
     const bestSelling = await pool.query(`
-      SELECT p.title, p.image, COUNT(*) as order_count 
+      SELECT p.title, p.image, SUM(COALESCE((item->>'quantity')::int, 1)) as order_count 
       FROM orders o, jsonb_array_elements(o.items) as item 
-      JOIN products p ON p.id = (item->>'productId')::int
-      GROUP BY p.id ORDER BY order_count DESC LIMIT 5
+      JOIN products p ON p.id = COALESCE((item->>'productId')::bigint, (item->>'id')::bigint)
+      WHERE o.status != 'cancelled'
+      GROUP BY p.id, p.title, p.image ORDER BY order_count DESC LIMIT 5
     `).catch(() => ({ rows: [] }));
 
     const recentOrders = await pool.query(
@@ -58,6 +61,8 @@ export const getDashboard = async (req: Request, res: Response) => {
       ordersThisMonth: parseInt(monthOrders.rows[0].count),
       pendingOrders: parseInt(pending.rows[0].count),
       completedOrders: parseInt(completed.rows[0].count),
+      cancelledOrders: parseInt(cancelled.rows[0].count),
+      inProcessOrders: parseInt(inProcess.rows[0].count),
       customRequests: parseInt(customRequests.rows[0].count),
       bestSelling: bestSelling.rows,
       recentOrders: recentOrders.rows,
@@ -258,6 +263,25 @@ export const getAdminProducts = async (req: Request, res: Response) => {
     ORDER BY p.created_at DESC
   `);
   res.json(rows);
+};
+
+export const getProductStats = async (req: Request, res: Response) => {
+  const prodId = parseInt(req.params.id, 10);
+  if (!prodId || isNaN(prodId)) return res.status(400).json({ error: "Invalid ID" });
+  try {
+    const result = await pool.query(`
+      SELECT COALESCE(SUM(COALESCE((item->>'quantity')::int, 1)), 0) as total_ordered
+      FROM orders o, jsonb_array_elements(o.items) as item
+      WHERE (
+        (item->>'productId' IS NOT NULL AND (item->>'productId')::bigint = $1)
+        OR (item->>'id' IS NOT NULL AND (item->>'id')::bigint = $1)
+      ) AND o.status != 'cancelled'
+    `, [prodId]);
+    res.json({ totalOrdered: parseInt(result.rows[0].total_ordered) });
+  } catch (err) {
+    console.error("Product stats error:", err);
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
 };
 
 export const createProduct = async (req: Request, res: Response) => {
@@ -519,11 +543,20 @@ export const getAdminOrders = async (req: Request, res: Response) => {
 
 export const updateOrderStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { status, note } = req.body;
-  const validStatuses = ['new_order', 'design_ready', 'printing', 'packed', 'shipped', 'delivered', 'cancelled'];
+  const { status, note, courier_name, tracking_id } = req.body;
+  const validStatuses = ['order_placed', 'verified', 'in_production', 'printed', 'ready_to_ship', 'out_for_delivery', 'delivered', 'cancelled'];
   if (!validStatuses.includes(status)) return res.status(400).json({ error: "Invalid status" });
 
-  await pool.query("UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2", [status, id]);
+  // Require tracking info for out_for_delivery or delivered
+  if (status === 'out_for_delivery' || status === 'delivered') {
+    if (!courier_name || !tracking_id) {
+      return res.status(400).json({ error: "Courier name and tracking ID are required for shipping" });
+    }
+    await pool.query("UPDATE orders SET status = $1, courier_name = $2, tracking_id = $3, updated_at = NOW() WHERE id = $4", [status, courier_name, tracking_id, id]);
+  } else {
+    await pool.query("UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2", [status, id]);
+  }
+
   await pool.query("INSERT INTO order_status_history (order_id, status, note) VALUES ($1, $2, $3)", [id, status, note || '']);
 
   const { rows } = await pool.query("SELECT * FROM orders WHERE id = $1", [id]);
@@ -662,4 +695,43 @@ export const uploadHomepageImage = async (req: Request, res: Response) => {
     console.error("Homepage image upload error:", err);
     res.status(500).json({ error: "Upload failed" });
   }
+};
+
+// ========== COURIERS ==========
+export const getCouriers = async (req: Request, res: Response) => {
+  const { rows } = await pool.query("SELECT * FROM couriers ORDER BY name");
+  res.json(rows);
+};
+
+export const createCourier = async (req: Request, res: Response) => {
+  const name = sanitizeText(req.body.name, 100);
+  const tracking_url = sanitizeText(req.body.tracking_url, 500);
+  if (!name || name.length < 2) return res.status(400).json({ error: "Name is required (min 2 chars)" });
+  if (!tracking_url || !tracking_url.includes('{tracking_id}')) {
+    return res.status(400).json({ error: "Tracking URL is required and must contain {tracking_id} placeholder" });
+  }
+  try {
+    const { rows } = await pool.query("INSERT INTO couriers (name, tracking_url) VALUES ($1, $2) RETURNING *", [name, tracking_url]);
+    res.status(201).json(rows[0]);
+  } catch (err: any) {
+    if (err.code === '23505') return res.status(400).json({ error: "Courier already exists" });
+    res.status(500).json({ error: "Failed to create courier" });
+  }
+};
+
+export const updateCourier = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { name, tracking_url, is_active } = req.body;
+  const { rows } = await pool.query(
+    "UPDATE couriers SET name = COALESCE($1, name), tracking_url = COALESCE($2, tracking_url), is_active = COALESCE($3, is_active) WHERE id = $4 RETURNING *",
+    [name || null, tracking_url || null, is_active, id]
+  );
+  res.json(rows[0]);
+};
+
+export const deleteCourier = async (req: Request, res: Response) => {
+  const cId = validatePositiveInt(req.params.id);
+  if (!cId) return res.status(400).json({ error: "Invalid ID" });
+  await pool.query("DELETE FROM couriers WHERE id = $1", [cId]);
+  res.json({ message: "Deleted" });
 };

@@ -7,13 +7,15 @@ import {
   getLayouts, createLayout, updateLayout, deleteLayout,
   getSizes, createSize, updateSize, deleteSize,
   getPricing, upsertPricing, deletePricing,
-  getAdminProducts, createProduct, updateProduct, deleteProduct, deleteProductImage, uploadProductImages, setMainImage,
+  getAdminProducts, getProductStats, createProduct, updateProduct, deleteProduct, deleteProductImage, uploadProductImages, setMainImage,
   getAdminOrders, updateOrderStatus, getOrderHistory,
   getCustomRequests, updateCustomRequestStatus,
   getCoupons, createCoupon, updateCoupon, deleteCoupon,
   getCustomers,
   getHomepageConfig, updateHomepageConfig, uploadHomepageImage,
+  getCouriers, createCourier, updateCourier, deleteCourier,
 } from "../controllers/adminController.ts";
+import { getAnalytics } from "../controllers/analyticsController.ts";
 
 const router = Router();
 const upload = multer({
@@ -58,6 +60,7 @@ router.delete("/pricing/:id", deletePricing);
 
 // Products (Posters)
 router.get("/products", getAdminProducts);
+router.get("/products/:id/stats", getProductStats);
 router.post("/products", upload.array("images", 10), createProduct);
 router.put("/products/:id", updateProduct);
 router.put("/products/:id/remove-image", deleteProductImage);
@@ -87,5 +90,14 @@ router.get("/customers", getCustomers);
 router.get("/homepage", getHomepageConfig);
 router.put("/homepage", updateHomepageConfig);
 router.post("/homepage/upload", upload.single("image"), uploadHomepageImage);
+
+// Analytics
+router.get("/analytics", getAnalytics);
+
+// Couriers
+router.get("/couriers", getCouriers);
+router.post("/couriers", createCourier);
+router.put("/couriers/:id", updateCourier);
+router.delete("/couriers/:id", deleteCourier);
 
 export default router;

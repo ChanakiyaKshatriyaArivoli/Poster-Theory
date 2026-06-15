@@ -15,6 +15,7 @@
   --color-z-shadow: rgba(0,0,0,1);
   --color-z-orange: #F97316;
   --color-z-orange-dark: #EA580C;
+  --color-z-label: #888888;
 }
 
 @layer base {
@@ -23,11 +24,12 @@
     --color-z-ink: #FFFFFF;
     --color-z-accent: #FFFFFF;
     --color-z-border: #FFFFFF;
-    --color-z-muted: #666666;
+    --color-z-muted: #AAAAAA;
     --color-z-white: #000000;
     --color-z-shadow: rgba(255,255,255,0.2);
     --color-z-orange: #FB923C;
     --color-z-orange-dark: #F97316;
+    --color-z-label: #CCCCCC;
   }
 
   body {
@@ -72,7 +74,7 @@
 }
 
 .sticker-btn {
-  @apply bg-z-ink text-z-paper px-6 py-3 font-display font-bold uppercase tracking-widest border-2 border-z-border shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all;
+  @apply bg-z-ink text-z-paper px-6 py-3 font-display font-bold uppercase tracking-widest border-2 border-z-border shadow-[4px_4px_0px_0px_var(--color-z-shadow)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all;
 }
 
 .tape {
@@ -106,4 +108,28 @@
 
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
+}
+
+/* Section label text — brighter and slightly larger in dark mode */
+.section-label {
+  @apply text-[11px] font-mono uppercase font-black text-z-label;
+  letter-spacing: 0.3em;
+}
+
+:root.dark .section-label {
+  font-size: 12px;
+}
+
+/* Date inputs — dark mode support */
+input[type="date"] {
+  color-scheme: light;
+}
+
+:root.dark input[type="date"] {
+  color-scheme: dark;
+}
+
+/* All mono uppercase tracking labels get a slight bump in dark mode */
+:root.dark .font-mono[class*="uppercase"][class*="tracking-"] {
+  color: var(--color-z-muted);
 }

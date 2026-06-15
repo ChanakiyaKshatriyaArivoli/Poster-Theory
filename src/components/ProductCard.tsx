@@ -66,7 +66,7 @@ export default function ProductCard(props: ProductProps) {
 
 export function CategoryCard({ title, image, path }: { title: string; image: string; path: string }) {
   return (
-    <Link to={path} className="group relative aspect-[210/297] overflow-hidden border-2 border-z-border shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all bg-z-white flex items-center justify-center p-3">
+    <Link to={path} className="group relative aspect-[210/297] overflow-hidden border-2 border-z-border shadow-[8px_8px_0px_0px_var(--color-z-shadow)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all bg-z-white flex items-center justify-center p-3">
       <div className="relative w-full h-full overflow-hidden border border-z-border flex items-center justify-center bg-[#f8f8f8]">
         {image ? (
           <img

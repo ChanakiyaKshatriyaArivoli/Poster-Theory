@@ -122,10 +122,12 @@ CREATE TABLE orders (
   items JSONB,
   total INTEGER,
   address_id INTEGER,
-  status TEXT DEFAULT 'new_order',
+  status TEXT DEFAULT 'order_placed',
   customer_name TEXT,
   customer_phone TEXT,
   customer_email TEXT,
+  courier_name TEXT DEFAULT '',
+  tracking_id TEXT DEFAULT '',
   notes TEXT DEFAULT '',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -211,6 +213,24 @@ CREATE TABLE user_cart (
   UNIQUE(user_id)
 );
 
+CREATE TABLE page_visits (
+  id SERIAL PRIMARY KEY,
+  page TEXT NOT NULL,
+  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  ip TEXT DEFAULT '',
+  user_agent TEXT DEFAULT '',
+  referrer TEXT DEFAULT '',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE couriers (
+  id SERIAL PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL,
+  tracking_url TEXT NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ============================================================
 -- INDEXES (production performance)
 -- ============================================================
@@ -224,6 +244,8 @@ CREATE INDEX idx_products_trending ON products(is_trending) WHERE status = 'acti
 CREATE INDEX idx_orders_user ON orders(user_id);
 CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_orders_created ON orders(created_at DESC);
+CREATE INDEX idx_page_visits_page ON page_visits(page, created_at);
+CREATE INDEX idx_page_visits_created ON page_visits(created_at DESC);
 
 -- ============================================================
 -- ADMIN USER

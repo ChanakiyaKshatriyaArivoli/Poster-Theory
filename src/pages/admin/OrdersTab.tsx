@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { X, Download, Package, Eye, Search } from 'lucide-react';
 import JSZip from 'jszip';
 import api from '../../lib/api';
@@ -17,8 +17,15 @@ export default function OrdersTab({ token }: { token: string | null }) {
   const [orderText, setOrderText] = useState('');
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [itemTracks, setItemTracks] = useState<Record<string, ItemTrack>>({});
+  const [couriers, setCouriers] = useState<any[]>([]);
+  const [shippingModal, setShippingModal] = useState<{ orderId: number } | null>(null);
+  const [shipCourier, setShipCourier] = useState('');
+  const [shipTrackingId, setShipTrackingId] = useState('');
 
-  useEffect(() => { api.get('/api/admin/orders', h(token)).then(r => setOrders(Array.isArray(r.data) ? r.data : [])).catch(() => {}); }, []);
+  useEffect(() => {
+    api.get('/api/admin/orders', h(token)).then(r => setOrders(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+    api.get('/api/admin/couriers', h(token)).then(r => setCouriers(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+  }, []);
 
   const [search, setSearch] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -62,27 +69,48 @@ export default function OrdersTab({ token }: { token: string | null }) {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const statuses = ['new_order', 'design_ready', 'printing', 'packed', 'shipped', 'delivered'];
+  const statuses = ['order_placed', 'verified', 'in_production', 'printed', 'ready_to_ship', 'out_for_delivery'];
   const statusLabels: Record<string, string> = {
-    new_order: 'Order Placed',
-    design_ready: 'Design Ready',
-    printing: 'In Production',
-    packed: 'Ready to Ship',
-    shipped: 'Out for Delivery',
+    order_placed: 'Order Placed',
+    verified: 'Verified',
+    in_production: 'In Production',
+    printed: 'Printed',
+    ready_to_ship: 'Ready to Ship',
+    out_for_delivery: 'Out for Delivery',
     delivered: 'Delivered',
+    cancelled: 'Cancelled',
   };
   const { run } = useAction();
   const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
 
-  const updateStatus = async (id: number, status: string) => {
+  const updateStatus = async (id: number, status: string, extra?: { courier_name?: string; tracking_id?: string }) => {
+    // If out_for_delivery, show shipping modal instead
+    if (status === 'out_for_delivery' && !extra) {
+      setShippingModal({ orderId: id });
+      setShipCourier('');
+      setShipTrackingId('');
+      return;
+    }
     setUpdatingOrderId(id);
     await run(async () => {
       try {
-        const res = await api.put(`/api/admin/orders/${id}/status`, { status }, h(token));
-        setOrders(prev => prev.map(o => o.id === id ? { ...o, status: res.data.status } : o));
-      } catch { alert("Failed to update"); }
+        const body: any = { status };
+        if (extra?.courier_name) body.courier_name = extra.courier_name;
+        if (extra?.tracking_id) body.tracking_id = extra.tracking_id;
+        const res = await api.put(`/api/admin/orders/${id}/status`, body, h(token));
+        setOrders(prev => prev.map(o => o.id === id ? { ...o, ...res.data } : o));
+      } catch (err: any) { alert(err.response?.data?.error || "Failed to update"); }
     });
     setUpdatingOrderId(null);
+  };
+
+  const handleShipConfirm = async () => {
+    if (!shippingModal || !shipCourier || !shipTrackingId.trim()) {
+      alert('Please select a courier and enter the tracking ID');
+      return;
+    }
+    await updateStatus(shippingModal.orderId, 'delivered', { courier_name: shipCourier, tracking_id: shipTrackingId.trim() });
+    setShippingModal(null);
   };
 
   const openOrder = async (order: any) => {
@@ -308,16 +336,33 @@ export default function OrdersTab({ token }: { token: string | null }) {
 
             <div className="flex flex-wrap gap-1.5 items-center">
               {updatingOrderId === order.id && <Spinner />}
-              {statuses.map(s => (
-                <button key={s} onClick={() => updateStatus(order.id, s)} disabled={updatingOrderId === order.id}
-                  className={`px-3 py-1 text-[8px] font-mono font-black uppercase border-2 transition-all active:scale-95 disabled:opacity-50 ${
-                    order.status === s
-                      ? 'bg-z-orange text-white border-z-orange'
-                      : 'border-z-border/30 hover:border-z-orange hover:text-z-orange text-z-ink'
-                  }`}>
-                  {statusLabels[s] || s.replace(/_/g, ' ')}
-                </button>
-              ))}
+              {order.status === 'cancelled' && <span className="px-3 py-1 text-[8px] font-mono font-black uppercase border-2 bg-red-100 text-red-700 border-red-300">Cancelled by Customer</span>}
+              {order.status !== 'cancelled' && statuses.map((s, idx) => {
+                const currentIdx = statuses.indexOf(order.status);
+                const isDelivered = order.status === 'delivered';
+                const isNext = idx === currentIdx + 1;
+                const isCurrent = order.status === s;
+                const isPast = idx <= currentIdx;
+                const allDone = isDelivered; // delivered = all green
+                const disabled = updatingOrderId === order.id || allDone || (!isCurrent && !isNext && !isPast);
+                return (
+                  <button key={s} onClick={() => updateStatus(order.id, s)} disabled={disabled}
+                    className={`px-3 py-1 text-[8px] font-mono font-black uppercase border-2 transition-all active:scale-95 disabled:cursor-not-allowed ${
+                      allDone
+                        ? 'bg-green-100 text-green-700 border-green-300 opacity-80'
+                        : isCurrent
+                        ? 'bg-z-orange text-white border-z-orange'
+                        : isPast
+                        ? 'bg-green-100 text-green-700 border-green-300'
+                        : isNext
+                        ? 'border-z-orange/50 text-z-orange hover:bg-z-orange hover:text-white'
+                        : 'border-z-border/30 text-z-ink opacity-30'
+                    }`}>
+                    {allDone ? '✓ ' : ''}{statusLabels[s] || s.replace(/_/g, ' ')}
+                  </button>
+                );
+              })}
+              {order.status === 'delivered' && <span className="text-[9px] font-mono font-black text-green-600 uppercase ml-2">✓ Shipped & Complete</span>}
             </div>
           </div>
         );
@@ -348,6 +393,9 @@ export default function OrdersTab({ token }: { token: string | null }) {
                 <h3 className="text-[14px] font-mono font-black uppercase tracking-widest text-z-ink">Order <span className="text-z-orange">#{selected.id}</span></h3>
                 <p className="text-[12px] font-mono text-z-muted mt-1">{selected.user_name} · {selected.phone}</p>
                 <p className="text-[11px] font-mono text-z-muted">{selected.line1}{selected.line2 ? ', ' + selected.line2 : ''}, {selected.city}, {selected.state} - {selected.pincode}</p>
+                {selected.courier_name && selected.tracking_id && (
+                  <p className="text-[11px] font-mono text-green-700 mt-2 font-bold">Shipped via {selected.courier_name} · AWB: {selected.tracking_id}</p>
+                )}
               </div>
               <button onClick={downloadOrderZip} disabled={loadingDetails}
                 className="px-5 py-2.5 bg-z-orange text-white text-[11px] font-mono font-black uppercase hover:bg-z-orange-dark transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50">
@@ -431,6 +479,39 @@ export default function OrdersTab({ token }: { token: string | null }) {
                 <pre className="mt-2 text-[8px] font-mono text-z-ink/70 bg-gray-50 dark:bg-z-ink/5 p-3 border border-z-border/20 overflow-x-auto whitespace-pre-wrap">{orderText}</pre>
               </details>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Shipping Modal */}
+      {shippingModal && (
+        <div className="fixed inset-0 z-[400] flex items-center justify-center p-4" onClick={() => setShippingModal(null)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="relative bg-z-paper border-2 border-z-border shadow-[8px_8px_0px_0px_var(--color-z-shadow)] p-6 max-w-md w-full" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShippingModal(null)} className="absolute top-3 right-3 w-8 h-8 bg-z-ink text-z-paper flex items-center justify-center hover:opacity-80">
+              <X className="w-4 h-4" />
+            </button>
+            <h3 className="text-[13px] font-mono font-black uppercase tracking-widest text-z-ink mb-6 pb-3 border-b-2 border-z-orange/30">Ship Order #{shippingModal.orderId}</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-[10px] font-mono uppercase tracking-widest text-z-muted mb-1 block font-black">Courier</label>
+                <select value={shipCourier} onChange={e => setShipCourier(e.target.value)}
+                  className="w-full bg-z-paper border-2 border-z-border/30 px-3 py-2.5 text-[12px] font-mono text-z-ink focus:outline-none focus:border-z-orange">
+                  <option value="">Select courier...</option>
+                  {couriers.filter(c => c.is_active).map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] font-mono uppercase tracking-widest text-z-muted mb-1 block font-black">Tracking ID (AWB)</label>
+                <input value={shipTrackingId} onChange={e => setShipTrackingId(e.target.value)}
+                  placeholder="Enter AWB / tracking number"
+                  className="w-full bg-z-paper border-2 border-z-border/30 px-3 py-2.5 text-[12px] font-mono text-z-ink focus:outline-none focus:border-z-orange" />
+              </div>
+              <button onClick={handleShipConfirm}
+                className="w-full bg-z-orange text-white py-3 text-[11px] font-mono font-black uppercase hover:bg-z-orange-dark transition-all active:scale-95">
+                Confirm Shipment
+              </button>
+            </div>
           </div>
         </div>
       )}

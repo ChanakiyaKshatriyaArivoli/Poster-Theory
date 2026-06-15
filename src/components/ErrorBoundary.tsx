@@ -32,7 +32,7 @@ export default class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="min-h-screen flex items-center justify-center px-6">
-          <div className="max-w-md w-full bg-z-paper border-2 border-z-border p-10 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-center">
+          <div className="max-w-md w-full bg-z-paper border-2 border-z-border p-10 shadow-[8px_8px_0px_0px_var(--color-z-shadow)] text-center">
             <h2 className="font-display font-black text-3xl uppercase tracking-tighter text-z-ink mb-4">Something went wrong</h2>
             <p className="font-mono text-[11px] text-z-muted uppercase tracking-widest mb-6">
               {this.state.error?.message || 'An unexpected error occurred'}

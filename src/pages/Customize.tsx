@@ -104,7 +104,7 @@ export default function Customize() {
       {/* Tutorial Overlay */}
       {showTutorial && (
         <div className="fixed inset-0 z-[300] bg-black/70 backdrop-blur-sm flex items-center justify-center p-6">
-          <div className="bg-z-paper border-2 border-z-border p-8 max-w-md w-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <div className="bg-z-paper border-2 border-z-border p-8 max-w-md w-full shadow-[8px_8px_0px_0px_var(--color-z-shadow)]">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-display font-black text-xl uppercase tracking-tight">Quick Guide</h3>
               <button onClick={dismissTutorial} className="p-1 hover:bg-z-ink hover:text-z-paper transition-all"><X className="w-4 h-4" /></button>
@@ -152,7 +152,7 @@ export default function Customize() {
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
             <div className="relative bg-gray-500 border-2 border-gray-600 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.4)] p-6 max-w-[92vw] max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
               {/* Close */}
-              <button onClick={() => editor.setPreviewMode(false)} className="absolute top-3 right-3 z-20 w-8 h-8 bg-white text-gray-700 flex items-center justify-center hover:opacity-80 transition-all">
+              <button onClick={() => editor.setPreviewMode(false)} className="absolute top-3 right-3 z-20 w-8 h-8 bg-z-paper text-z-ink flex items-center justify-center hover:opacity-80 transition-all">
                 <X className="w-4 h-4" />
               </button>
 
@@ -176,7 +176,7 @@ export default function Customize() {
                   const imgW = Math.round((paperW - m.left - m.right) * pxPerMm);
                   const imgH = Math.round((paperH - m.top - m.bottom) * pxPerMm);
                   return (
-                    <div className="bg-white shadow-2xl flex items-center justify-center border border-gray-200"
+                    <div className="bg-z-paper shadow-2xl flex items-center justify-center border border-z-border"
                       style={{ width: Math.round(paperW * pxPerMm), height: previewH, padding: `${padTop}px ${padRight}px ${padBottom}px ${padLeft}px` }}>
                       <img src={activePage.previewUrl} alt="Preview"
                         style={{ width: imgW, height: imgH, objectFit: 'cover' }} />
