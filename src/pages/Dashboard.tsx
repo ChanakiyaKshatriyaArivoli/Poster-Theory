@@ -154,12 +154,6 @@ export default function Dashboard() {
             {user?.is_admin && (
                 <Link to="/admin" className="sticker-btn bg-z-ink text-z-paper">ADMIN_TERMINAL_</Link>
             )}
-            <button 
-              onClick={() => {}}
-              className="px-6 py-2 border-2 border-z-border font-mono text-[10px] font-bold hover:bg-z-ink hover:text-z-paper transition-all uppercase"
-            >
-              Sign Out
-            </button>
           </div>
         </header>
 
