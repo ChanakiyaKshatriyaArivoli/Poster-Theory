@@ -84,38 +84,38 @@ export default function Home() {
   );
 
   return (
-    <div className="pt-20">
+    <div className="pt-16 sm:pt-20">
       <Hero />
 
       {/* Trust Bar */}
-      <section className="border-y-2 border-z-border py-5 bg-z-paper">
-        <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="flex items-center gap-3">
-            <Truck className="w-5 h-5 text-z-ink shrink-0" />
+      <section className="border-y-2 border-z-border py-4 sm:py-5 bg-z-paper">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Truck className="w-4 sm:w-5 h-4 sm:h-5 text-z-ink shrink-0" />
             <div>
-              <p className="text-[11px] font-mono font-bold uppercase text-z-ink">Free Shipping</p>
-              <p className="text-[9px] font-mono text-z-muted uppercase">Orders above ₹499</p>
+              <p className="text-[10px] sm:text-[11px] font-mono font-bold uppercase text-z-ink">Free Shipping</p>
+              <p className="text-[8px] sm:text-[9px] font-mono text-z-muted uppercase">Orders above ₹499</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Shield className="w-5 h-5 text-z-ink shrink-0" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Shield className="w-4 sm:w-5 h-4 sm:h-5 text-z-ink shrink-0" />
             <div>
-              <p className="text-[11px] font-mono font-bold uppercase text-z-ink">Premium Quality</p>
-              <p className="text-[9px] font-mono text-z-muted uppercase">300 GSM Matte Paper</p>
+              <p className="text-[10px] sm:text-[11px] font-mono font-bold uppercase text-z-ink">Premium Quality</p>
+              <p className="text-[8px] sm:text-[9px] font-mono text-z-muted uppercase">300 GSM Matte</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <RotateCcw className="w-5 h-5 text-z-ink shrink-0" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <RotateCcw className="w-4 sm:w-5 h-4 sm:h-5 text-z-ink shrink-0" />
             <div>
-              <p className="text-[11px] font-mono font-bold uppercase text-z-ink">Easy Returns</p>
-              <p className="text-[9px] font-mono text-z-muted uppercase">7 day return policy</p>
+              <p className="text-[10px] sm:text-[11px] font-mono font-bold uppercase text-z-ink">Easy Returns</p>
+              <p className="text-[8px] sm:text-[9px] font-mono text-z-muted uppercase">7 day policy</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Palette className="w-5 h-5 text-z-ink shrink-0" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Palette className="w-4 sm:w-5 h-4 sm:h-5 text-z-ink shrink-0" />
             <div>
-              <p className="text-[11px] font-mono font-bold uppercase text-z-ink">Custom Prints</p>
-              <p className="text-[9px] font-mono text-z-muted uppercase">Upload your own design</p>
+              <p className="text-[10px] sm:text-[11px] font-mono font-bold uppercase text-z-ink">Custom Prints</p>
+              <p className="text-[8px] sm:text-[9px] font-mono text-z-muted uppercase">Your own design</p>
             </div>
           </div>
         </div>
@@ -160,23 +160,23 @@ export default function Home() {
       )}
 
       {/* How It Works */}
-      <section className="py-16 sm:py-24 px-6 border-b-2 border-z-border">
+      <section className="py-12 sm:py-24 px-4 sm:px-6 border-b-2 border-z-border">
         <div className="max-w-[1440px] mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-z-muted font-bold mb-2">Simple Process</p>
-            <h2 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter text-z-ink">How It Works</h2>
+          <div className="text-center mb-8 sm:mb-14">
+            <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.3em] text-z-muted font-bold mb-2">Simple Process</p>
+            <h2 className="font-display font-black text-2xl sm:text-5xl uppercase tracking-tighter text-z-ink">How It Works</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
             {[
-              { step: '01', title: 'Browse', desc: 'Explore our curated collections or search for your favorites' },
-              { step: '02', title: 'Choose', desc: 'Pick your size, layout & print style — or upload your own image' },
-              { step: '03', title: 'Order', desc: 'Secure checkout with multiple payment options' },
-              { step: '04', title: 'Delivered', desc: 'Premium prints shipped safely to your doorstep' },
+              { step: '01', title: 'Browse', desc: 'Explore our curated collections' },
+              { step: '02', title: 'Choose', desc: 'Pick size, layout & style' },
+              { step: '03', title: 'Order', desc: 'Secure checkout' },
+              { step: '04', title: 'Delivered', desc: 'Shipped to your door' },
             ].map((item) => (
-              <div key={item.step} className="text-center p-6 border-2 border-z-border hover:border-z-ink transition-colors group">
-                <span className="font-display font-black text-4xl text-z-ink/10 group-hover:text-z-ink/30 transition-colors">{item.step}</span>
-                <h3 className="font-display font-bold text-xl uppercase tracking-tighter text-z-ink mt-3 mb-2">{item.title}</h3>
-                <p className="text-[11px] font-mono text-z-muted uppercase leading-relaxed">{item.desc}</p>
+              <div key={item.step} className="text-center p-4 sm:p-6 border-2 border-z-border hover:border-z-ink transition-colors group">
+                <span className="font-display font-black text-2xl sm:text-4xl text-z-ink/10 group-hover:text-z-ink/30 transition-colors">{item.step}</span>
+                <h3 className="font-display font-bold text-base sm:text-xl uppercase tracking-tighter text-z-ink mt-2 sm:mt-3 mb-1 sm:mb-2">{item.title}</h3>
+                <p className="text-[9px] sm:text-[11px] font-mono text-z-muted uppercase leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -194,9 +194,9 @@ export default function Home() {
       )}
 
       {/* Custom Print CTA */}
-      <section className="py-16 sm:py-24 px-6">
+      <section className="py-12 sm:py-24 px-4 sm:px-6">
         <div className="max-w-[1440px] mx-auto">
-          <div className="bg-z-ink text-z-paper p-8 sm:p-16 flex flex-col md:flex-row items-center gap-8 md:gap-16">
+          <div className="bg-z-ink text-z-paper p-6 sm:p-16 flex flex-col md:flex-row items-center gap-6 sm:gap-16">
             <div className="flex-1">
               <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-z-paper/50 mb-4">Custom Print Studio</p>
               <h2 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter leading-[0.9] mb-6">
@@ -238,9 +238,9 @@ export default function Home() {
       )}
 
       {/* About */}
-      <section className="py-20 sm:py-32 px-6 bg-gray-50">
+      <section className="py-12 sm:py-32 px-4 sm:px-6 bg-gray-50">
         <div className="max-w-[1200px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-20 items-center">
             <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
               <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-z-muted font-bold mb-4">About Us</p>
               <h2 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter text-z-ink leading-[0.9] mb-6">

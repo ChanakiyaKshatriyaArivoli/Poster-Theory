@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Eye, Download, X, ChevronRight, ImagePlus } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -100,7 +100,7 @@ export default function Customize() {
   };
 
   return (
-    <div className="pt-40 pb-32 min-h-screen px-6">
+    <div className="pt-24 sm:pt-40 pb-32 min-h-screen px-6">
       {/* Tutorial Overlay */}
       {showTutorial && (
         <div className="fixed inset-0 z-[300] bg-black/70 backdrop-blur-sm flex items-center justify-center p-6">

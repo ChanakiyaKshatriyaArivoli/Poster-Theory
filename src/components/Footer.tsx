@@ -9,9 +9,9 @@ export default function Footer() {
   const { theme } = useTheme();
   return (
     <>
-    <footer className="bg-z-paper border-t-2 border-z-border pt-24 pb-12 px-6">
+    <footer className="bg-z-paper border-t-2 border-z-border pt-12 sm:pt-24 pb-8 sm:pb-12 px-4 sm:px-6">
       <div className="max-w-[1440px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24 uppercase font-bold">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 sm:gap-16 mb-12 sm:mb-24 uppercase font-bold">
           <div className="col-span-1 md:col-span-2">
             <Link to="/" className="inline-block mb-10 hover:opacity-80 transition-opacity">
               <Logo size="footer" />

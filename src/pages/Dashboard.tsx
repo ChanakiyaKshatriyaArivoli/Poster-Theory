@@ -141,7 +141,7 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="pt-40 pb-32 min-h-screen">
+    <div className="pt-24 sm:pt-40 pb-32 min-h-screen">
       <div className="max-w-7xl mx-auto px-6">
         <header className="mb-20 flex flex-col md:flex-row justify-between items-end gap-10 border-b-4 border-z-border pb-12">
           <div>

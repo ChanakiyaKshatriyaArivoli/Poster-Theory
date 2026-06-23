@@ -223,14 +223,14 @@ export default function Shop() {
   );
 
   return (
-    <div className="pt-40 pb-32 min-h-screen">
+    <div className="pt-24 sm:pt-40 pb-16 sm:pb-32 min-h-screen">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12">
-        <header className="mb-16 flex flex-col xl:flex-row xl:items-end justify-between border-b-4 border-z-border pb-12 gap-8">
+        <header className="mb-8 sm:mb-16 flex flex-col xl:flex-row xl:items-end justify-between border-b-4 border-z-border pb-6 sm:pb-12 gap-4 sm:gap-8">
           <div className="flex-1 min-w-0">
-            <h1 className="font-display font-black text-6xl sm:text-8xl lg:text-9xl uppercase tracking-tighter leading-none italic break-words lg:whitespace-nowrap flex flex-wrap gap-x-6">
+            <h1 className="font-display font-black text-4xl sm:text-8xl lg:text-9xl uppercase tracking-tighter leading-none italic">
               <span className="text-outline">Collections</span>
             </h1>
-            <p className="text-[30px] font-mono text-red-500 uppercase mt-4 tracking-widest">All A series Sizes</p>
+            <p className="text-[14px] sm:text-[30px] font-mono text-red-500 uppercase mt-2 sm:mt-4 tracking-widest">All A series Sizes</p>
           </div>
           {/* Inline search */}
           <form onSubmit={handleLocalSearch} className="relative" ref={searchRef}>

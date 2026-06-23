@@ -135,7 +135,7 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 w-full z-[100] bg-z-paper/80 backdrop-blur-md border-b-2 border-z-border">
-      <div className="max-w-[1440px] mx-auto px-6 h-24 flex items-center justify-between">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-16 sm:h-24 flex items-center justify-between">
         <Link to="/" className="flex items-center hover:opacity-80 transition-opacity py-2">
           <Logo size="md" />
         </Link>
@@ -370,14 +370,14 @@ export default function Navbar() {
             exit={{ height: 0, opacity: 0 }}
             className="lg:hidden bg-z-paper border-t-2 border-z-border overflow-hidden"
           >
-            <div className="px-6 py-10 space-y-8">
-              <div className="space-y-6">
+            <div className="px-6 py-8 space-y-6">
+              <div className="space-y-4">
                 <p className="text-[11px] font-mono font-black text-z-muted uppercase tracking-[0.4em]">DIRECTORY_</p>
                 {navLinks.map((link) => (
                   <Link
                     key={link.name}
                     to={link.path}
-                    className="block font-display font-black text-5xl uppercase tracking-tighter hover:text-outline transition-all"
+                    className="block font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter hover:text-outline transition-all"
                     onClick={() => setIsOpen(false)}
                   >
                     {link.name}

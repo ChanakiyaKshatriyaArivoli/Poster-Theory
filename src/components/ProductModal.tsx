@@ -110,12 +110,12 @@ export default function ProductModal({ product, onClose }: Props) {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="relative bg-z-paper border-2 border-z-border shadow-[8px_8px_0px_0px_var(--color-z-shadow)] max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative bg-z-paper border-t-2 sm:border-2 border-z-border sm:shadow-[8px_8px_0px_0px_var(--color-z-shadow)] w-full sm:max-w-4xl max-h-[92vh] sm:max-h-[90vh] overflow-y-auto rounded-t-xl sm:rounded-none"
         onClick={e => e.stopPropagation()}
       >
         <button onClick={onClose} className="absolute top-3 right-3 z-20 w-8 h-8 bg-z-ink text-z-paper flex items-center justify-center hover:opacity-80">
@@ -124,7 +124,7 @@ export default function ProductModal({ product, onClose }: Props) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* Left - Image Slideshow */}
-          <div className="p-6 bg-gray-50 dark:bg-z-ink/5 flex flex-col items-center justify-center min-h-[400px] border-b md:border-b-0 md:border-r border-z-border/30 relative">
+          <div className="p-4 sm:p-6 bg-gray-50 dark:bg-z-ink/5 flex flex-col items-center justify-center min-h-[250px] sm:min-h-[400px] border-b md:border-b-0 md:border-r border-z-border/30 relative">
             <AnimatePresence mode="wait">
               <motion.img
                 key={currentImg}
@@ -134,7 +134,7 @@ export default function ProductModal({ product, onClose }: Props) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="max-h-[380px] max-w-full object-contain"
+                className="max-h-[250px] sm:max-h-[380px] max-w-full object-contain"
               />
             </AnimatePresence>
 
@@ -161,8 +161,8 @@ export default function ProductModal({ product, onClose }: Props) {
           </div>
 
           {/* Right - Options */}
-          <div className="p-6 flex flex-col">
-            <h2 className="font-display font-black text-2xl uppercase tracking-tighter text-z-ink mb-1">{product.title}</h2>
+          <div className="p-4 sm:p-6 flex flex-col">
+            <h2 className="font-display font-black text-xl sm:text-2xl uppercase tracking-tighter text-z-ink mb-1">{product.title}</h2>
             <p className="text-[10px] font-mono text-z-muted uppercase mb-2">{product.collection_name || 'Poster'}</p>
 
             {/* Size */}

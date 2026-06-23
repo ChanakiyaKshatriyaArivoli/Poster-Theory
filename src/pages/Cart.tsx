@@ -94,7 +94,7 @@ export default function Cart() {
 
   if (step === 'success') {
     return (
-      <div className="pt-40 pb-32 min-h-screen flex items-center justify-center">
+      <div className="pt-24 sm:pt-40 pb-32 min-h-screen flex items-center justify-center">
         <div className="max-w-lg w-full px-6 text-center">
           <div className="w-20 h-20 bg-green-100 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
             <CheckCircle className="w-10 h-10 text-green-600" />
@@ -125,7 +125,7 @@ export default function Cart() {
 
   if (cart.length === 0 && step === 'cart') {
     return (
-      <div className="pt-40 pb-32 min-h-screen flex items-center justify-center">
+      <div className="pt-24 sm:pt-40 pb-32 min-h-screen flex items-center justify-center">
         <div className="max-w-md w-full px-6 text-center">
           <div className="polaroid mx-auto mb-12 rotate-[-4deg] w-48">
             <div className="tape -top-4 -left-6" />
@@ -144,7 +144,7 @@ export default function Cart() {
   }
 
   return (
-    <div className="pt-40 pb-32 min-h-screen px-6">
+    <div className="pt-24 sm:pt-40 pb-32 min-h-screen px-6">
       <div className="max-w-7xl mx-auto">
         <header className="mb-20 border-b-4 border-z-border pb-8 flex items-baseline justify-between">
           <h1 className="font-display font-black text-6xl md:text-8xl uppercase tracking-tighter italic leading-none">

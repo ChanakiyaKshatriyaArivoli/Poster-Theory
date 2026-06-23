@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export default function Story() {
   return (
-    <div className="pt-40 pb-32 min-h-screen">
+    <div className="pt-24 sm:pt-40 pb-32 min-h-screen">
       <div className="max-w-[1440px] mx-auto px-6">
         <header className="mb-32 text-center border-b-4 border-z-border pb-24">
             <span className="text-[14px] font-mono uppercase tracking-[0.5em] text-z-muted font-black mb-10 block underline decoration-4 underline-offset-8">THE_GENESIS_FILE</span>
