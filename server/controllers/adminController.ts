@@ -325,9 +325,9 @@ export const createProduct = async (req: Request, res: Response) => {
       uploadedUrls.push(result.secure_url);
     }
 
-    const parsedTags = req.body.tags ? (typeof req.body.tags === 'string' ? JSON.parse(req.body.tags) : req.body.tags) : [];
-    const parsedSizes = req.body.available_sizes ? (typeof req.body.available_sizes === 'string' ? JSON.parse(req.body.available_sizes) : req.body.available_sizes) : [];
-    const parsedLayouts = req.body.available_layouts ? (typeof req.body.available_layouts === 'string' ? JSON.parse(req.body.available_layouts) : req.body.available_layouts) : [];
+    const parsedTags = req.body.tags ? (typeof req.body.tags === 'string' ? (() => { try { const t = JSON.parse(req.body.tags); return Array.isArray(t) ? t : []; } catch { return []; } })() : req.body.tags) : [];
+    const parsedSizes = req.body.available_sizes ? (typeof req.body.available_sizes === 'string' ? (() => { try { const s = JSON.parse(req.body.available_sizes); return Array.isArray(s) ? s : []; } catch { return []; } })() : req.body.available_sizes) : [];
+    const parsedLayouts = req.body.available_layouts ? (typeof req.body.available_layouts === 'string' ? (() => { try { const l = JSON.parse(req.body.available_layouts); return Array.isArray(l) ? l : []; } catch { return []; } })() : req.body.available_layouts) : [];
 
     // Validate arrays contain only numbers
     if (!Array.isArray(parsedTags)) return res.status(400).json({ error: "Tags must be an array" });
@@ -418,18 +418,19 @@ export const updateProduct = async (req: Request, res: Response) => {
     const { rows } = await pool.query(
       `UPDATE products SET 
         title = COALESCE($1, title), description = COALESCE($2, description), collection_id = COALESCE($3, collection_id),
-        tags = COALESCE($4, tags), orientation = COALESCE($5, orientation),
-        available_sizes = COALESCE($6, available_sizes), available_layouts = COALESCE($7, available_layouts),
+        tags = COALESCE($4::text[], tags), orientation = COALESCE($5, orientation),
+        available_sizes = COALESCE($6::int[], available_sizes), available_layouts = COALESCE($7::int[], available_layouts),
         status = COALESCE($8, status),
-        is_featured = CASE WHEN $9::boolean IS NOT NULL THEN $9 ELSE is_featured END,
-        is_trending = CASE WHEN $10::boolean IS NOT NULL THEN $10 ELSE is_trending END,
-        is_new_arrival = CASE WHEN $11::boolean IS NOT NULL THEN $11 ELSE is_new_arrival END,
-        is_bestseller = CASE WHEN $12::boolean IS NOT NULL THEN $12 ELSE is_bestseller END
+        is_featured = COALESCE($9, is_featured),
+        is_trending = COALESCE($10, is_trending),
+        is_new_arrival = COALESCE($11, is_new_arrival),
+        is_bestseller = COALESCE($12, is_bestseller)
        WHERE id = $13 RETURNING *`,
       [title || null, description ?? null, collection_id || null, tags || null, orientation || null, available_sizes || null, available_layouts || null, status || null, is_featured ?? null, is_trending ?? null, is_new_arrival ?? null, is_bestseller ?? null, prodId]
     );
     res.json(rows[0]);
   } catch (err) {
+    console.error("Update product error:", err);
     res.status(500).json({ error: "Failed to update product" });
   }
 };

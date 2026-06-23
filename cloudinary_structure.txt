@@ -52,7 +52,7 @@ cld admin delete_folder "poster-theory"
 
 Option 3: Node.js Script (run once)
 ---------------------------------------------
-// Save as cleanup_cloudinary.mjs and run: node cleanup_cloudinary.mjs
+// Save as cleanup_cloudinary.mjs and run: node --env-file=.env cleanup_cloudinary.mjs
 
 import { v2 as cloudinary } from 'cloudinary';
 

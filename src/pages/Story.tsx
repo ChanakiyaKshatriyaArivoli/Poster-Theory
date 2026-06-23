@@ -43,7 +43,7 @@ export default function Story() {
           </p>
 
           <div className="pt-24 border-t-4 border-z-border flex flex-col items-center">
-            <Link to="/shop" className="sticker-btn bg-z-ink text-white scale-125">EXPLORE_THE_CURATIONS_</Link>
+            <Link to="/collection" className="sticker-btn bg-z-ink text-white scale-125">EXPLORE_THE_CURATIONS_</Link>
             <p className="mt-16 font-mono text-[13px] uppercase font-black text-z-muted tracking-[0.5em]">END_OF_TRANSMISSION</p>
           </div>
         </div>

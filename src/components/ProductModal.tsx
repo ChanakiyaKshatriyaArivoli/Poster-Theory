@@ -46,15 +46,13 @@ export default function ProductModal({ product, onClose }: Props) {
   const productLayoutIds: number[] = Array.isArray(product.available_layouts) ? product.available_layouts : [];
 
   const availableSizes = useMemo(() => {
-    if (productSizeIds.length === 0) return sizes;
+    if (productSizeIds.length === 0) return [];
     return sizes.filter(s => s.id != null && productSizeIds.includes(s.id));
   }, [sizes, productSizeIds]);
 
   const availableLayouts = useMemo(() => {
-    let filtered = layouts;
-    if (productLayoutIds.length > 0) {
-      filtered = layouts.filter(l => l.id != null && productLayoutIds.includes(l.id));
-    }
+    if (productLayoutIds.length === 0) return [];
+    let filtered = layouts.filter(l => l.id != null && productLayoutIds.includes(l.id));
     if (isSingleOnly) filtered = filtered.filter(l => l.panel_count === 1);
     return filtered;
   }, [layouts, productLayoutIds, isSingleOnly]);
@@ -165,9 +163,10 @@ export default function ProductModal({ product, onClose }: Props) {
           {/* Right - Options */}
           <div className="p-6 flex flex-col">
             <h2 className="font-display font-black text-2xl uppercase tracking-tighter text-z-ink mb-1">{product.title}</h2>
-            <p className="text-[10px] font-mono text-z-muted uppercase mb-6">{product.collection_name || 'Poster'}</p>
+            <p className="text-[10px] font-mono text-z-muted uppercase mb-2">{product.collection_name || 'Poster'}</p>
 
             {/* Size */}
+            {availableSizes.length > 0 && (
             <div className="mb-4">
               <label className="text-[9px] font-mono font-black uppercase tracking-widest text-z-muted mb-2 block">Paper Size</label>
               <div className="flex flex-wrap gap-2">
@@ -181,6 +180,7 @@ export default function ProductModal({ product, onClose }: Props) {
                 ))}
               </div>
             </div>
+            )}
 
             {/* Orientation */}
             {canChooseOrientation && (
@@ -200,6 +200,7 @@ export default function ProductModal({ product, onClose }: Props) {
             )}
 
             {/* Layout */}
+            {availableLayouts.length > 0 && (
             <div className="mb-4">
               <label className="text-[9px] font-mono font-black uppercase tracking-widest text-z-muted mb-2 block">Layout</label>
               <div className="flex flex-wrap gap-2">
@@ -213,6 +214,7 @@ export default function ProductModal({ product, onClose }: Props) {
                 ))}
               </div>
             </div>
+            )}
 
             {/* Print Style - only for single layout, not for Polaroid/Pocket */}
             {panelCount <= 1 && !SINGLE_ONLY_SIZES.includes(selectedSize) && (

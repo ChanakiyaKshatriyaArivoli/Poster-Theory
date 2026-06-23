@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, ShoppingBag, CreditCard, MapPin, CheckCircle } from 'lucide-react';
@@ -105,7 +105,7 @@ export default function Cart() {
 
           {/* Cancellation Policy */}
           <div className="text-left border-2 border-amber-400 bg-amber-50 p-5 mb-10">
-            <p className="text-[11px] font-mono font-black uppercase text-amber-800 mb-2">⚠ Cancellation Policy</p>
+            <p className="text-[11px] font-mono font-black uppercase text-amber-800 mb-2">? Cancellation Policy</p>
             <ul className="text-[10px] font-mono text-amber-700 leading-relaxed space-y-1 list-disc pl-4">
               <li>You can cancel your order before it enters <span className="font-black">In Production</span>.</li>
               <li>Once production begins, cancellation is <span className="font-black">not available</span>.</li>
@@ -116,7 +116,7 @@ export default function Cart() {
 
           <div className="flex gap-4 justify-center">
             <Link to="/dashboard" className="sticker-btn bg-z-ink text-z-paper">View Orders</Link>
-            <Link to="/shop" className="sticker-btn">Continue Shopping</Link>
+            <Link to="/collection" className="sticker-btn">Continue Shopping</Link>
           </div>
         </div>
       </div>
@@ -135,7 +135,7 @@ export default function Cart() {
           <h2 className="font-display font-black text-5xl uppercase tracking-tighter mb-4 text-z-ink">Your bag is empty.</h2>
           <p className="font-mono text-[13px] text-z-muted mb-12 uppercase font-bold tracking-widest leading-relaxed">Start your journey in our archive.</p>
           <div className="flex flex-col sm:flex-row gap-8 justify-center">
-            <Link to="/shop" className="sticker-btn scale-110">Browse Posters</Link>
+            <Link to="/collection" className="sticker-btn scale-110">Browse Posters</Link>
             <Link to="/customize" className="sticker-btn scale-110 bg-z-orange border-z-orange">Create Your Own</Link>
           </div>
         </div>
@@ -186,8 +186,8 @@ export default function Cart() {
                           </span>
                         </div>
                       )}
-                      <p className="text-z-ink mt-8 font-display font-black text-2xl italic tracking-tighter">₹{(item.price * item.quantity).toLocaleString()}</p>
-                      {item.quantity > 1 && <p className="text-[10px] font-mono text-z-muted mt-1">₹{item.price.toLocaleString()} × {item.quantity}</p>}
+                      <p className="text-z-ink mt-8 font-display font-black text-2xl italic tracking-tighter">?{(item.price * item.quantity).toLocaleString()}</p>
+                      {item.quantity > 1 && <p className="text-[10px] font-mono text-z-muted mt-1">?{item.price.toLocaleString()} � {item.quantity}</p>}
                     </div>
                     <div className="flex items-center space-x-6 mt-8 sm:mt-0">
                       <label className="text-[12px] font-mono uppercase text-z-muted font-black tracking-widest">Qty:</label>
@@ -212,14 +212,14 @@ export default function Cart() {
                   {cart.map((item) => (
                     <div key={item.cartItemId} className="flex justify-between font-mono text-[11px] text-z-muted uppercase">
                       <span className="truncate max-w-[140px]">{item.title}</span>
-                      <span className="text-z-ink font-bold whitespace-nowrap">₹{item.price.toLocaleString()} × {item.quantity} = ₹{(item.price * item.quantity).toLocaleString()}</span>
+                      <span className="text-z-ink font-bold whitespace-nowrap">?{item.price.toLocaleString()} � {item.quantity} = ?{(item.price * item.quantity).toLocaleString()}</span>
                     </div>
                   ))}
                 </div>
                 <div className="space-y-6 mb-12 border-t-2 border-z-border pt-6">
                   <div className="flex justify-between font-mono text-[13px] font-bold text-z-muted uppercase">
                     <span>Subtotal:</span>
-                    <span className="text-z-ink tracking-widest font-black">₹{total.toLocaleString()}</span>
+                    <span className="text-z-ink tracking-widest font-black">?{total.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between font-mono text-[13px] font-bold text-z-muted uppercase">
                     <span>Shipping:</span>
@@ -227,7 +227,7 @@ export default function Cart() {
                   </div>
                   <div className="border-t-2 border-z-border pt-8 flex justify-between items-baseline">
                     <span className="font-display font-black text-2xl uppercase tracking-tighter">Total:</span>
-                    <span className="font-display font-black text-5xl text-z-ink tracking-tighter italic">₹{total.toLocaleString()}</span>
+                    <span className="font-display font-black text-5xl text-z-ink tracking-tighter italic">?{total.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -292,10 +292,10 @@ export default function Cart() {
                         <img src={item.image} alt={item.title} className="w-12 h-16 object-cover border border-z-border" />
                         <div>
                           <p className="font-display font-black text-sm uppercase">{item.title}</p>
-                          <p className="text-[9px] font-mono text-z-muted uppercase">QTY: {item.quantity} × ₹{item.price.toLocaleString()}</p>
+                          <p className="text-[9px] font-mono text-z-muted uppercase">QTY: {item.quantity} � ?{item.price.toLocaleString()}</p>
                         </div>
                       </div>
-                      <p className="font-mono font-bold">₹{(item.price * item.quantity).toLocaleString()}</p>
+                      <p className="font-mono font-bold">?{(item.price * item.quantity).toLocaleString()}</p>
                     </div>
                   ))}
                 </div>
@@ -318,13 +318,13 @@ export default function Cart() {
               <div className="border-2 border-z-ink p-8 bg-z-ink text-z-paper">
                 <div className="flex justify-between items-baseline">
                   <span className="font-display font-black text-2xl uppercase">Total</span>
-                  <span className="font-display font-black text-4xl italic">₹{total.toLocaleString()}</span>
+                  <span className="font-display font-black text-4xl italic">?{total.toLocaleString()}</span>
                 </div>
               </div>
 
               {/* Cancellation Policy Notice */}
               <div className="border-2 border-amber-400 bg-amber-50 p-5">
-                <p className="text-[11px] font-mono font-black uppercase text-amber-800 mb-2">⚠ Cancellation Policy</p>
+                <p className="text-[11px] font-mono font-black uppercase text-amber-800 mb-2">? Cancellation Policy</p>
                 <p className="text-[10px] font-mono text-amber-700 leading-relaxed">
                   You can cancel your order only before it enters production. Once the order status moves to "In Production", cancellation is no longer available. For post-production issues, please contact our support team.
                 </p>

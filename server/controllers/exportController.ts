@@ -79,16 +79,17 @@ export const exportHighRes = async (req: AuthRequest, res: Response) => {
       fullImage = await sharp(imageBuffer).resize(printWidthPx, printHeightPx, { fit: 'cover' }).png().toBuffer();
     }
 
-    const sanitized = (fileName || 'print').replace(/[^a-zA-Z0-9_\-. ]/g, '').replace(/\.[^.]+$/, '').slice(0, 80) || 'print';
+    const sanitized = (fileName || 'print').replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\.\.+/g, '').trim().slice(0, 80) || 'print';
 
     // Single panel — return PNG directly
     if (panelCount <= 1) {
-      const downloadName = `${sanitized}_${size}_${orientation}_300dpi.png`;
+      const downloadName = `${sanitized}_${size.replace(/[^a-zA-Z0-9]/g, '')}_${orientation}_300dpi.png`;
       res.set({
         'Content-Type': 'image/png',
         'Content-Disposition': `attachment; filename="${encodeURIComponent(downloadName)}"`,
         'Content-Length': fullImage.length.toString(),
         'X-Content-Type-Options': 'nosniff',
+        'Cache-Control': 'no-store',
       });
       return res.send(fullImage);
     }
@@ -124,11 +125,12 @@ export const exportHighRes = async (req: AuthRequest, res: Response) => {
     }
 
     // Stream ZIP
-    const zipName = `${sanitized}_${size}_${orientation}_${panelCount}panel.zip`;
+    const zipName = `${sanitized}_${size.replace(/[^a-zA-Z0-9]/g, '')}_${orientation}_${panelCount}panel.zip`;
     res.set({
       'Content-Type': 'application/zip',
       'Content-Disposition': `attachment; filename="${encodeURIComponent(zipName)}"`,
       'X-Content-Type-Options': 'nosniff',
+      'Cache-Control': 'no-store',
     });
 
     const archive = new Archiver('zip', { zlib: { level: 6 } });

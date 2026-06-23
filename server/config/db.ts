@@ -8,9 +8,21 @@ const { Pool } = pg;
 // import { seedDatabase } from "./seed.ts";
 // ────────────────────────────────────────────────────
 
+const getDatabaseUrl = (): string => {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL environment variable is required");
+  // Only allow postgresql:// protocol
+  if (!url.startsWith('postgresql://') && !url.startsWith('postgres://')) {
+    throw new Error("DATABASE_URL must use postgresql:// protocol");
+  }
+  return url;
+};
+
+const dbUrl = getDatabaseUrl();
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL?.includes('sslmode=require') ? { rejectUnauthorized: true } : false,
+  connectionString: dbUrl,
+  ssl: dbUrl.includes('sslmode=require') ? { rejectUnauthorized: true } : false,
   connectionTimeoutMillis: 10000,
   idleTimeoutMillis: 20000,
   max: 5,

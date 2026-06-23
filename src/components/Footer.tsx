@@ -8,6 +8,7 @@ import Logo from './Logo';
 export default function Footer() {
   const { theme } = useTheme();
   return (
+    <>
     <footer className="bg-z-paper border-t-2 border-z-border pt-24 pb-12 px-6">
       <div className="max-w-[1440px] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24 uppercase font-bold">
@@ -16,7 +17,7 @@ export default function Footer() {
               <Logo size="footer" />
             </Link>
             <p className="text-z-muted max-w-sm leading-relaxed text-sm mb-10 font-mono tracking-tight font-bold">
-              [ROMANTICIZING_THE_EVERYDAY] — We curate objects of intent for the modern digital native. Digital minimalism, brutalist impact.
+              Curated poster prints for your walls — Anime, Movies, Music, Minimal & more.
             </p>
             <div className="flex space-x-8 text-z-ink">
               <Instagram className="w-5 h-5 hover:text-outline cursor-pointer transition-all" />
@@ -26,12 +27,13 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-[14px] font-display font-black tracking-widest text-z-ink mb-10 border-b-2 border-z-border inline-block pb-1 italic">DIRECTORY</h4>
-            <ul className="space-y-4 text-sm tracking-widest text-z-muted hoven:text-z-ink font-bold">
-              <li><Link to="/shop" className="hover:text-z-accent transition-colors">All_Objects</Link></li>
-              <li><Link to="/customize" className="hover:text-z-accent transition-colors">Build_Canvas</Link></li>
-              <li><Link to="/story" className="hover:text-z-accent transition-colors">Mission_Brief</Link></li>
-              <li><Link to="/archives" className="hover:text-z-accent transition-colors">Historical_Drop</Link></li>
+            <h4 className="text-[14px] font-display font-black tracking-widest text-z-ink mb-10 border-b-2 border-z-border inline-block pb-1 italic">SUPPORT</h4>
+            <ul className="space-y-4 text-sm tracking-widest text-z-muted font-bold">
+              <li><Link to="/contact" className="hover:text-z-accent transition-colors">Contact Us</Link></li>
+              <li><Link to="/faqs" className="hover:text-z-accent transition-colors">FAQs</Link></li>
+              <li><Link to="/terms" className="hover:text-z-accent transition-colors">Terms & Conditions</Link></li>
+              <li><Link to="/shipping-policy" className="hover:text-z-accent transition-colors">Shipping Policy</Link></li>
+              <li><Link to="/cancellation-policy" className="hover:text-z-accent transition-colors">Cancellation Policy</Link></li>
             </ul>
           </div>
 
@@ -60,5 +62,17 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+
+    {/* Disclaimer */}
+    <div className="bg-orange-500 text-white py-5 px-6">
+      <div className="max-w-[1440px] mx-auto text-center space-y-2">
+        <p className="text-[11px] sm:text-[12px] font-mono leading-relaxed text-z-paper/80">
+          The posters featured on this platform include fan-made artwork, AI-assisted designs, and original creations. None of the artwork claims affiliation with or endorsement by any brand, studio, or artist unless explicitly stated. For concerns or takedown requests, reach out to{' '}
+          <a href="mailto:support@postertheory.in" className="underline font-bold text-z-paper hover:text-z-paper/60 transition-colors">support@postertheory.in</a>
+        </p>
+        <p className="text-[10px] font-mono text-z-paper/50">© {new Date().getFullYear()} Poster Theory — All rights reserved.</p>
+      </div>
+    </div>
+    </>
   );
 }

@@ -51,6 +51,14 @@ async function startServer() {
   // Trust proxy — configurable for environments with multiple proxies
   app.set('trust proxy', parseInt(process.env.TRUST_PROXY_HOPS || '1', 10));
 
+  // Global CSRF protection for all state-changing requests.
+  // Exempt paths are handled before this middleware.
+  const csrfExemptPaths = ['/api/auth', '/api/track-visit'];
+  app.use((req, res, next) => {
+    if (csrfExemptPaths.some(p => req.path.startsWith(p))) return next();
+    return csrfProtection(req, res, next);
+  });
+
   // API Routes
   app.use("/api/auth", authRoutes);
   app.use("/api/products", productRoutes);
@@ -61,7 +69,7 @@ async function startServer() {
   app.use("/api/export", exportRoutes);
   app.use("/api/admin", adminRoutes);
 
-  // Public analytics tracking
+  // Public analytics tracking (exempt from CSRF — non-sensitive, fire-and-forget)
   app.post("/api/track-visit", trackVisit);
 
   // Serve Uploads

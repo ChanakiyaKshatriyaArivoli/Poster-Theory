@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 import QuoteMarquee from '../components/QuoteMarquee';
 import ProductCard from '../components/ProductCard';
-import Logo from '../components/Logo';
 
 interface SectionConfig {
   limit: number;
@@ -36,7 +35,7 @@ export default function Home() {
       const savedCats: any[] = hpRes.data?.collection_images?.collections || [];
       const merged = dbCats.map((c: any) => {
         const saved = savedCats.find((s: any) => s.name === c.name);
-        return { name: c.name, img: saved?.img || '', path: `/shop?collection=${c.name}` };
+        return { name: c.name, img: saved?.img || '', path: `/collection?collection=${c.name}` };
       });
       setCollections(merged);
       if (hpRes.data?.about_image?.url) setAboutImage(hpRes.data.about_image.url);
@@ -66,7 +65,7 @@ export default function Home() {
     }).catch(() => {
       // Fallback: fetch without config
       api.get('/api/products/collections').then(r => {
-        if (Array.isArray(r.data)) setCollections(r.data.map((c: any) => ({ name: c.name, img: '', path: `/shop?collection=${c.name}` })));
+        if (Array.isArray(r.data)) setCollections(r.data.map((c: any) => ({ name: c.name, img: '', path: `/collection?collection=${c.name}` })));
       }).catch(() => {});
       api.get('/api/products?filter=new_arrival&limit=8').then(r => setNewArrivals(Array.isArray(r.data) ? r.data : [])).catch(() => {});
       api.get('/api/products?filter=trending&limit=8').then(r => setTrending(Array.isArray(r.data) ? r.data : [])).catch(() => {});
@@ -82,12 +81,12 @@ export default function Home() {
           <p className="text-[12px] font-mono uppercase tracking-[0.4em] text-z-muted font-black mb-3">{label}</p>
           <h2 className="font-display font-black text-4xl sm:text-6xl uppercase tracking-tighter text-z-ink leading-none">{title}</h2>
         </div>
-        <Link to={`/shop?status=${statusLink}`} className="sticker-btn bg-z-ink text-white whitespace-nowrap">View All</Link>
+        <Link to={`/collection?status=${statusLink}`} className="sticker-btn bg-z-ink text-white whitespace-nowrap">View All</Link>
       </div>
       <div className="group">
         <div className="flex gap-6 animate-marquee-scroll hover:[animation-play-state:paused] md:[animation-play-state:running] [animation-play-state:paused] md:animate-marquee-scroll overflow-x-auto md:overflow-visible scrollbar-hide px-6 md:px-0">
           {[...items, ...items].map((p: any, idx: number) => (
-            <div key={`${p.id}-${idx}`} className="w-32 sm:w-40 shrink-0">
+            <div key={`${p.id}-${idx}`} className="w-48 sm:w-56 shrink-0">
               <ProductCard {...p} />
             </div>
           ))}
@@ -136,8 +135,8 @@ export default function Home() {
           <div className="group">
             <div className="flex gap-6 animate-marquee-scroll hover:[animation-play-state:paused] md:[animation-play-state:running] [animation-play-state:paused] md:animate-marquee-scroll overflow-x-auto md:overflow-visible scrollbar-hide px-6 md:px-0">
               {[...collections, ...collections].map((cat, idx) => (
-                <Link key={idx} to={cat.path} className="snap-center min-w-[140px] sm:min-w-[180px] flex flex-col items-center shrink-0 group/card">
-                  <div className="w-32 sm:w-40 aspect-[210/297] overflow-hidden border-2 border-z-border group-hover/card:border-z-ink transition-all shadow-[4px_4px_0px_0px_var(--color-z-shadow)] group-hover/card:shadow-none group-hover/card:translate-x-[2px] group-hover/card:translate-y-[2px]">
+                <Link key={idx} to={cat.path} className="snap-center min-w-[200px] sm:min-w-[250px] flex flex-col items-center shrink-0 group/card">
+                  <div className="w-48 sm:w-56 aspect-[210/297] overflow-hidden border-2 border-z-border group-hover/card:border-z-ink transition-all shadow-[4px_4px_0px_0px_var(--color-z-shadow)] group-hover/card:shadow-none group-hover/card:translate-x-[2px] group-hover/card:translate-y-[2px]">
                     {cat.img ? (
                       <img src={cat.img} alt={cat.name} loading="lazy" className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" />
                     ) : (
@@ -152,7 +151,7 @@ export default function Home() {
             </div>
           </div>
           <div className="max-w-[1600px] mx-auto px-6 mt-10 flex justify-center">
-            <Link to="/shop" className="sticker-btn bg-z-ink text-white">All Collections</Link>
+            <Link to="/collection" className="sticker-btn bg-z-ink text-white">All Collections</Link>
           </div>
         </section>
       )}
@@ -249,17 +248,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Bottom CTA */}
-      <section className="border-t-2 border-z-border py-16 sm:py-20 px-6 text-center">
-        <div className="max-w-3xl mx-auto">
-          <Logo size="lg" className="mx-auto mb-8" />
-          <p className="font-mono text-[12px] uppercase tracking-[0.3em] text-z-muted mb-8">Your walls deserve better.</p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link to="/shop" className="sticker-btn bg-z-ink text-white">Browse All Posters</Link>
-            <Link to="/customize" className="sticker-btn bg-z-paper text-z-ink">Custom Print</Link>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

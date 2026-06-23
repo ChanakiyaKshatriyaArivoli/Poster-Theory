@@ -144,6 +144,10 @@ export const googleCallback = async (req: Request, res: Response) => {
   } catch (err) {
     console.error("Google OAuth error");
     const appUrl = process.env.APP_URL || '';
+    // Validate appUrl before redirecting
+    if (!appUrl || !appUrl.startsWith('http')) {
+      return res.status(500).json({ error: "OAuth configuration error" });
+    }
     res.redirect(`${appUrl}/login?error=oauth_failed`);
   }
 };

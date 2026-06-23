@@ -14,8 +14,11 @@ const transporter = nodemailer.createTransport({
   socketTimeout: 10000,
 } as any);
 
+// Sanitize values before logging to prevent log injection
+const sanitizeForLog = (val: string): string => val.replace(/[\n\r\t]/g, '').slice(0, 100);
+
 export const sendOtpEmail = async (to: string, otp: string, name: string, type: 'signup' | 'reset' = 'signup') => {
-  console.log(`[OTP] ${type.toUpperCase()} code for ${to}: ${otp}`);
+  console.log(`[OTP] ${type.toUpperCase()} code for ${sanitizeForLog(to)}: ${sanitizeForLog(otp)}`);
 
   const subject = type === 'reset' ? 'Reset your password - Poster Theory' : 'Verify your email - Poster Theory';
   const heading = type === 'reset' ? `Hey ${name},<br/>Reset your password` : `Hey ${name},`;
@@ -42,7 +45,7 @@ export const sendOtpEmail = async (to: string, otp: string, name: string, type: 
   try {
     await transporter.sendMail(mailOptions);
   } catch (err) {
-    console.error(`[MAILER] Failed to send email to ${to}:`, (err as any).code || err);
+    console.error(`[MAILER] Failed to send email to ${sanitizeForLog(to)}:`, (err as any).code || err);
     // Don't throw — signup should still succeed, OTP is logged above
   }
 };

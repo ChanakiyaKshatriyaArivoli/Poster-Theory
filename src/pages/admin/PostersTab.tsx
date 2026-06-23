@@ -17,6 +17,7 @@ export default function PostersTab({ token }: { token: string | null }) {
   const [deletingImg, setDeletingImg] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [imageError, setImageError] = useState('');
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [search, setSearch] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [page, setPage] = useState(1);
@@ -94,7 +95,12 @@ export default function PostersTab({ token }: { token: string | null }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (imageFiles.length === 0) { setImageError('Please select at least one image'); return; }
+    const errors: Record<string, string> = {};
+    if (form.available_sizes.length === 0) errors.available_sizes = 'Select at least one size';
+    if (form.available_layouts.length === 0) errors.available_layouts = 'Select at least one layout';
+    if (imageFiles.length === 0) errors.images = 'Please select at least one image';
+    if (Object.keys(errors).length > 0) { setFormErrors(errors); return; }
+    setFormErrors({});
     setSubmitting(true);
     const fd = new FormData();
     fd.append('title', form.title);
@@ -124,6 +130,7 @@ export default function PostersTab({ token }: { token: string | null }) {
 
   const openEdit = async (product: any) => {
     setSelected(product);
+    setEditErrors({});
     setEditForm({
       title: product.title || '',
       description: product.description || '',
@@ -146,8 +153,15 @@ export default function PostersTab({ token }: { token: string | null }) {
     } catch {}
   };
 
+  const [editErrors, setEditErrors] = useState<Record<string, string>>({});
+
   const handleUpdate = async () => {
     if (!selected || !editForm) return;
+    const errors: Record<string, string> = {};
+    if (editForm.available_sizes.length === 0) errors.available_sizes = 'Select at least one size';
+    if (editForm.available_layouts.length === 0) errors.available_layouts = 'Select at least one layout';
+    if (Object.keys(errors).length > 0) { setEditErrors(errors); return; }
+    setEditErrors({});
     setSaving(true);
     try {
       const payload = {
@@ -224,7 +238,7 @@ export default function PostersTab({ token }: { token: string | null }) {
               <Label>Available Sizes</Label>
               <div className="flex flex-wrap gap-2">
                 {sizes.map(s => (
-                  <button type="button" key={s.id} onClick={() => setForm({...form, available_sizes: toggleArr(form.available_sizes, s.id)})}
+                  <button type="button" key={s.id} onClick={() => { setForm({...form, available_sizes: toggleArr(form.available_sizes, s.id)}); setFormErrors(prev => ({...prev, available_sizes: ''})); }}
                     className={`px-3 py-1 text-[9px] font-mono font-black uppercase border-2 transition-all active:scale-95 ${
                       form.available_sizes.includes(s.id) ? 'bg-z-orange text-white border-z-orange' : 'border-z-border/30 hover:border-z-orange hover:text-z-orange text-z-ink'
                     }`}>
@@ -232,13 +246,14 @@ export default function PostersTab({ token }: { token: string | null }) {
                   </button>
                 ))}
               </div>
+              {formErrors.available_sizes && <p className="text-red-500 text-[9px] font-mono font-black uppercase mt-1">{formErrors.available_sizes}</p>}
             </div>
 
             <div>
               <Label>Available Layouts</Label>
               <div className="flex flex-wrap gap-2">
                 {layouts.map(l => (
-                  <button type="button" key={l.id} onClick={() => setForm({...form, available_layouts: toggleArr(form.available_layouts, l.id)})}
+                  <button type="button" key={l.id} onClick={() => { setForm({...form, available_layouts: toggleArr(form.available_layouts, l.id)}); setFormErrors(prev => ({...prev, available_layouts: ''})); }}
                     className={`px-3 py-1 text-[9px] font-mono font-black uppercase border-2 transition-all active:scale-95 ${
                       form.available_layouts.includes(l.id) ? 'bg-z-orange text-white border-z-orange' : 'border-z-border/30 hover:border-z-orange hover:text-z-orange text-z-ink'
                     }`}>
@@ -246,6 +261,7 @@ export default function PostersTab({ token }: { token: string | null }) {
                   </button>
                 ))}
               </div>
+              {formErrors.available_layouts && <p className="text-red-500 text-[9px] font-mono font-black uppercase mt-1">{formErrors.available_layouts}</p>}
             </div>
 
             <div>
@@ -289,7 +305,7 @@ export default function PostersTab({ token }: { token: string | null }) {
               )}
             </div>
 
-            {imageError && <p className="text-red-500 text-[10px] font-mono font-black uppercase">{imageError}</p>}
+            {(imageError || formErrors.images) && <p className="text-red-500 text-[10px] font-mono font-black uppercase">{imageError || formErrors.images}</p>}
             <button type="submit" disabled={submitting} className="w-full bg-z-orange text-white py-3 text-[11px] font-mono font-black uppercase disabled:opacity-50 active:scale-95 transition-all hover:bg-z-orange-dark shadow-[4px_4px_0px_0px_var(--color-z-shadow)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
               {submitting ? <span className="flex items-center justify-center gap-2"><Spinner /> Uploading...</span> : 'Add Poster'}
             </button>
@@ -453,7 +469,7 @@ export default function PostersTab({ token }: { token: string | null }) {
                 <Label>Available Sizes</Label>
                 <div className="flex flex-wrap gap-2">
                   {sizes.map(s => (
-                    <button type="button" key={s.id} onClick={() => setEditForm({...editForm, available_sizes: toggleArr(editForm.available_sizes, s.id)})}
+                    <button type="button" key={s.id} onClick={() => { setEditForm({...editForm, available_sizes: toggleArr(editForm.available_sizes, s.id)}); setEditErrors(prev => ({...prev, available_sizes: ''})); }}
                       className={`px-3 py-1 text-[9px] font-mono font-black uppercase border-2 transition-all active:scale-95 ${
                         editForm.available_sizes.includes(s.id) ? 'bg-z-orange text-white border-z-orange' : 'border-z-border/30 hover:border-z-orange hover:text-z-orange text-z-ink'
                       }`}>
@@ -461,13 +477,14 @@ export default function PostersTab({ token }: { token: string | null }) {
                     </button>
                   ))}
                 </div>
+                {editErrors.available_sizes && <p className="text-red-500 text-[9px] font-mono font-black uppercase mt-1">{editErrors.available_sizes}</p>}
               </div>
 
               <div>
                 <Label>Available Layouts</Label>
                 <div className="flex flex-wrap gap-2">
                   {layouts.map(l => (
-                    <button type="button" key={l.id} onClick={() => setEditForm({...editForm, available_layouts: toggleArr(editForm.available_layouts, l.id)})}
+                    <button type="button" key={l.id} onClick={() => { setEditForm({...editForm, available_layouts: toggleArr(editForm.available_layouts, l.id)}); setEditErrors(prev => ({...prev, available_layouts: ''})); }}
                       className={`px-3 py-1 text-[9px] font-mono font-black uppercase border-2 transition-all active:scale-95 ${
                         editForm.available_layouts.includes(l.id) ? 'bg-z-orange text-white border-z-orange' : 'border-z-border/30 hover:border-z-orange hover:text-z-orange text-z-ink'
                       }`}>
@@ -475,6 +492,7 @@ export default function PostersTab({ token }: { token: string | null }) {
                     </button>
                   ))}
                 </div>
+                {editErrors.available_layouts && <p className="text-red-500 text-[9px] font-mono font-black uppercase mt-1">{editErrors.available_layouts}</p>}
               </div>
 
               <div>

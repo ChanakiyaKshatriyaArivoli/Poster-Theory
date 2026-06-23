@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
 import { Package, Heart, ChevronRight, ArrowRight, MapPin, User, X, Plus, Star, AlertTriangle, XCircle } from 'lucide-react';
@@ -307,7 +307,7 @@ export default function Dashboard() {
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                           <div className="mb-6 sm:mb-0">
                             <p className="text-[10px] font-mono uppercase tracking-widest text-z-muted mb-3 font-bold underline decoration-2 decoration-z-border">REF_ID: STUDIO-{order.id}</p>
-                            <p className="font-display font-black text-4xl text-z-ink tracking-tighter uppercase leading-none italic"><span className="text-outline">₹</span>{order.total.toLocaleString()}</p>
+                            <p className="font-display font-black text-4xl text-z-ink tracking-tighter uppercase leading-none italic"><span className="text-outline">?</span>{order.total.toLocaleString()}</p>
                             <p className="text-[9px] font-mono font-bold uppercase text-z-muted mt-4 tracking-widest">RECORDED: {new Date(order.created_at).toLocaleDateString()}</p>
                           </div>
                           <div className="flex items-center space-x-8 w-full sm:w-auto justify-between sm:justify-end">
@@ -349,7 +349,7 @@ export default function Dashboard() {
                                             isCompleted ? 'bg-green-500 text-white border-green-500' :
                                             'bg-z-paper text-z-muted border-z-border/40'
                                           }`}>
-                                            {isCompleted && !isCurrent ? '✓' : idx + 1}
+                                            {isCompleted && !isCurrent ? '?' : idx + 1}
                                           </div>
                                           <p className={`text-[8px] font-mono font-bold uppercase mt-2 text-center leading-tight ${
                                             isCurrent ? 'text-z-ink' : isCompleted ? 'text-green-600' : 'text-z-muted'
@@ -374,7 +374,7 @@ export default function Dashboard() {
                                     <React.Fragment key={step}>
                                       <div className="flex flex-col items-center min-w-[80px]">
                                         <div className="w-7 h-7 rounded-full border-2 flex items-center justify-center text-[9px] font-mono font-black bg-green-500 text-white border-green-500">
-                                          ✓
+                                          ?
                                         </div>
                                         <p className="text-[8px] font-mono font-bold uppercase mt-2 text-center leading-tight text-green-600">{STEP_LABELS[step]}</p>
                                       </div>
@@ -395,7 +395,7 @@ export default function Dashboard() {
                                 <a href={order.courier_tracking_url ? order.courier_tracking_url.replace('{tracking_id}', order.tracking_id) : `https://www.google.com/search?q=${encodeURIComponent(order.courier_name)}+tracking+${encodeURIComponent(order.tracking_id)}`}
                                   target="_blank" rel="noopener noreferrer"
                                   className="inline-block mt-3 px-4 py-2 bg-blue-600 text-white text-[10px] font-mono font-black uppercase hover:bg-blue-700 transition-all active:scale-95">
-                                  Track Package →
+                                  Track Package ?
                                 </a>
                               </div>
                             )}
@@ -438,7 +438,7 @@ export default function Dashboard() {
                                         <p className="text-[9px] font-mono uppercase tracking-widest text-z-muted font-bold">QTY: {item.quantity || 1} // COL: {item.collection || 'N/A'}</p>
                                       </div>
                                    </div>
-                                   <p className="font-mono font-black text-sm text-z-ink">₹{item.price.toLocaleString()}</p>
+                                   <p className="font-mono font-black text-sm text-z-ink">?{item.price.toLocaleString()}</p>
                                 </div>
                               )) : (
                                 <p className="font-mono text-[10px] uppercase tracking-widest text-z-muted italic">NO_ITEM_DATA_LOGGED_FOR_THIS_TRANSACTION_</p>
@@ -453,7 +453,7 @@ export default function Dashboard() {
               ) : (
                 <div className="bg-z-paper border-2 border-dashed border-z-border p-20 text-center">
                   <p className="font-display font-black text-2xl uppercase tracking-tighter text-z-muted italic mb-8 underline underline-offset-8">ARCHIVE_IS_EMPTY</p>
-                  <Link to="/shop" className="sticker-btn bg-z-ink text-white inline-block">EXPLORE_THE_DIRECTORY_</Link>
+                  <Link to="/collection" className="sticker-btn bg-z-ink text-white inline-block">EXPLORE_THE_DIRECTORY_</Link>
                 </div>
               )}
             </section>

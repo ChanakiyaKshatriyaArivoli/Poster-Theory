@@ -46,7 +46,8 @@ function AppContent() {
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/shop" element={<Shop />} />
+          <Route path="/collection" element={<Shop />} />
+          <Route path="/shop" element={<Navigate to="/collection" />} />
           <Route path="/customize" element={<Customize />} />
           <Route path="/story" element={<Story />} />
           <Route path="/cart" element={<Cart />} />

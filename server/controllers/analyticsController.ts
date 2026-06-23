@@ -22,24 +22,52 @@ export const trackVisit = async (req: Request, res: Response) => {
   }
 };
 
+// Validate date string format (YYYY-MM-DD)
+const isValidDate = (d: string | undefined): boolean => {
+  if (!d) return false;
+  return /^\d{4}-\d{2}-\d{2}$/.test(d) && !isNaN(Date.parse(d));
+};
+
 // Full analytics data for admin
 export const getAnalytics = async (req: Request, res: Response) => {
-  const startDate = req.query.start as string | undefined;
-  const endDate = req.query.end as string | undefined;
+  const startDate = isValidDate(req.query.start as string) ? (req.query.start as string) : undefined;
+  const endDate = isValidDate(req.query.end as string) ? (req.query.end as string) : undefined;
 
-  // Build date filter clause
+  // Build parameterized date filter helpers
   const hasRange = startDate || endDate;
-  const orderDateFilter = hasRange
-    ? `AND o.created_at ${startDate ? `>= '${startDate}'` : '>= \'1970-01-01\''}${endDate ? ` AND o.created_at <= '${endDate}'::date + INTERVAL '1 day'` : ''}`
-    : '';
-  const visitDateFilter = hasRange
-    ? `AND pv.created_at ${startDate ? `>= '${startDate}'` : '>= \'1970-01-01\''}${endDate ? ` AND pv.created_at <= '${endDate}'::date + INTERVAL '1 day'` : ''}`
-    : '';
-  const userDateFilter = hasRange
-    ? `AND created_at ${startDate ? `>= '${startDate}'` : '>= \'1970-01-01\''}${endDate ? ` AND created_at <= '${endDate}'::date + INTERVAL '1 day'` : ''}`
-    : '';
+  // Params array will be built per-query with these values
+  const startVal = startDate || '1970-01-01';
+  const endVal = endDate || '9999-12-31';
+
+  // Helper to build WHERE clause fragments with param placeholders
+  // For orders (alias o)
+  const buildOrderFilter = (paramOffset: number) => {
+    if (!hasRange) return { clause: '', params: [] as string[] };
+    return {
+      clause: `AND o.created_at >= $${paramOffset}::date AND o.created_at <= $${paramOffset + 1}::date + INTERVAL '1 day'`,
+      params: [startVal, endVal],
+    };
+  };
+  const buildVisitFilter = (paramOffset: number) => {
+    if (!hasRange) return { clause: '', params: [] as string[] };
+    return {
+      clause: `AND pv.created_at >= $${paramOffset}::date AND pv.created_at <= $${paramOffset + 1}::date + INTERVAL '1 day'`,
+      params: [startVal, endVal],
+    };
+  };
+  const buildUserFilter = (paramOffset: number) => {
+    if (!hasRange) return { clause: '', params: [] as string[] };
+    return {
+      clause: `AND created_at >= $${paramOffset}::date AND created_at <= $${paramOffset + 1}::date + INTERVAL '1 day'`,
+      params: [startVal, endVal],
+    };
+  };
 
   try {
+    const of1 = buildOrderFilter(1);
+    const vf1 = buildVisitFilter(1);
+    const uf1 = buildUserFilter(1);
+
     const [
       totalRevenue,
       revenueByDay,
@@ -58,89 +86,98 @@ export const getAnalytics = async (req: Request, res: Response) => {
       totalCustomers,
       newCustomers,
     ] = await Promise.all([
-      pool.query(`SELECT COALESCE(SUM(total), 0) as total FROM orders o WHERE status != 'cancelled' ${orderDateFilter}`),
+      pool.query(`SELECT COALESCE(SUM(total), 0) as total FROM orders o WHERE status != 'cancelled' ${of1.clause}`, of1.params),
 
-      pool.query(`
-        SELECT DATE(o.created_at) as date, SUM(total) as revenue, COUNT(*) as orders
-        FROM orders o WHERE status != 'cancelled' ${orderDateFilter || "AND o.created_at >= NOW() - INTERVAL '30 days'"}
-        GROUP BY DATE(o.created_at) ORDER BY date
-      `),
+      pool.query(
+        hasRange
+          ? `SELECT DATE(o.created_at) as date, SUM(total) as revenue, COUNT(*) as orders FROM orders o WHERE status != 'cancelled' ${of1.clause} GROUP BY DATE(o.created_at) ORDER BY date`
+          : `SELECT DATE(o.created_at) as date, SUM(total) as revenue, COUNT(*) as orders FROM orders o WHERE status != 'cancelled' AND o.created_at >= NOW() - INTERVAL '30 days' GROUP BY DATE(o.created_at) ORDER BY date`,
+        hasRange ? of1.params : []
+      ),
 
-      pool.query(`
-        SELECT TO_CHAR(o.created_at, 'YYYY-MM') as month, SUM(total) as revenue, COUNT(*) as orders
-        FROM orders o WHERE status != 'cancelled' ${orderDateFilter || "AND o.created_at >= NOW() - INTERVAL '12 months'"}
-        GROUP BY TO_CHAR(o.created_at, 'YYYY-MM') ORDER BY month
-      `),
+      pool.query(
+        hasRange
+          ? `SELECT TO_CHAR(o.created_at, 'YYYY-MM') as month, SUM(total) as revenue, COUNT(*) as orders FROM orders o WHERE status != 'cancelled' ${of1.clause} GROUP BY TO_CHAR(o.created_at, 'YYYY-MM') ORDER BY month`
+          : `SELECT TO_CHAR(o.created_at, 'YYYY-MM') as month, SUM(total) as revenue, COUNT(*) as orders FROM orders o WHERE status != 'cancelled' AND o.created_at >= NOW() - INTERVAL '12 months' GROUP BY TO_CHAR(o.created_at, 'YYYY-MM') ORDER BY month`,
+        hasRange ? of1.params : []
+      ),
 
-      pool.query(`SELECT COUNT(*) FROM orders o WHERE 1=1 ${orderDateFilter}`),
+      pool.query(`SELECT COUNT(*) FROM orders o WHERE 1=1 ${of1.clause}`, of1.params),
 
-      pool.query(`SELECT status, COUNT(*) as count FROM orders o WHERE 1=1 ${orderDateFilter} GROUP BY status ORDER BY count DESC`),
+      pool.query(`SELECT status, COUNT(*) as count FROM orders o WHERE 1=1 ${of1.clause} GROUP BY status ORDER BY count DESC`, of1.params),
 
-      pool.query(`SELECT COUNT(*) FROM page_visits pv WHERE 1=1 ${visitDateFilter}`),
+      pool.query(`SELECT COUNT(*) FROM page_visits pv WHERE 1=1 ${vf1.clause}`, vf1.params),
 
-      pool.query(`
-        SELECT page, COUNT(*) as views, COUNT(DISTINCT ip) as unique_views
-        FROM page_visits pv WHERE 1=1 ${visitDateFilter}
-        GROUP BY page ORDER BY views DESC LIMIT 20
-      `),
+      pool.query(`SELECT page, COUNT(*) as views, COUNT(DISTINCT ip) as unique_views FROM page_visits pv WHERE 1=1 ${vf1.clause} GROUP BY page ORDER BY views DESC LIMIT 20`, vf1.params),
 
       pool.query("SELECT COUNT(*) FROM page_visits WHERE created_at >= CURRENT_DATE"),
 
-      pool.query(`
-        SELECT DATE(pv.created_at) as date, COUNT(*) as views, COUNT(DISTINCT ip) as unique_views
-        FROM page_visits pv WHERE 1=1 ${visitDateFilter || "AND pv.created_at >= NOW() - INTERVAL '30 days'"}
-        GROUP BY DATE(pv.created_at) ORDER BY date
-      `),
+      pool.query(
+        hasRange
+          ? `SELECT DATE(pv.created_at) as date, COUNT(*) as views, COUNT(DISTINCT ip) as unique_views FROM page_visits pv WHERE 1=1 ${vf1.clause} GROUP BY DATE(pv.created_at) ORDER BY date`
+          : `SELECT DATE(pv.created_at) as date, COUNT(*) as views, COUNT(DISTINCT ip) as unique_views FROM page_visits pv WHERE 1=1 AND pv.created_at >= NOW() - INTERVAL '30 days' GROUP BY DATE(pv.created_at) ORDER BY date`,
+        hasRange ? vf1.params : []
+      ),
 
-      pool.query(`SELECT COUNT(DISTINCT ip) FROM page_visits pv WHERE 1=1 ${visitDateFilter || "AND pv.created_at >= NOW() - INTERVAL '30 days'"}`),
+      pool.query(
+        hasRange
+          ? `SELECT COUNT(DISTINCT ip) FROM page_visits pv WHERE 1=1 ${vf1.clause}`
+          : `SELECT COUNT(DISTINCT ip) FROM page_visits pv WHERE 1=1 AND pv.created_at >= NOW() - INTERVAL '30 days'`,
+        hasRange ? vf1.params : []
+      ),
 
-      pool.query(`
-        SELECT p.id, p.title, p.image, c.name as collection_name,
+      pool.query(
+        `SELECT p.id, p.title, p.image, c.name as collection_name,
           SUM(COALESCE((item->>'quantity')::int, 1)) as units_sold,
           SUM((item->>'price')::int * COALESCE((item->>'quantity')::int, 1)) as revenue
         FROM orders o, jsonb_array_elements(o.items) as item
         JOIN products p ON p.id = COALESCE((item->>'productId')::bigint, (item->>'id')::bigint)
         LEFT JOIN collections c ON p.collection_id = c.id
-        WHERE o.status != 'cancelled' ${orderDateFilter}
+        WHERE o.status != 'cancelled' ${of1.clause}
         GROUP BY p.id, p.title, p.image, c.name
-        ORDER BY units_sold DESC LIMIT 15
-      `).catch(() => ({ rows: [] })),
+        ORDER BY units_sold DESC LIMIT 15`, of1.params
+      ).catch(() => ({ rows: [] })),
 
-      pool.query(`
-        SELECT c.name as collection, SUM(COALESCE((item->>'quantity')::int, 1)) as units_sold,
+      pool.query(
+        `SELECT c.name as collection, SUM(COALESCE((item->>'quantity')::int, 1)) as units_sold,
           SUM((item->>'price')::int * COALESCE((item->>'quantity')::int, 1)) as revenue
         FROM orders o, jsonb_array_elements(o.items) as item
         JOIN products p ON p.id = COALESCE((item->>'productId')::bigint, (item->>'id')::bigint)
         JOIN collections c ON p.collection_id = c.id
-        WHERE o.status != 'cancelled' ${orderDateFilter}
-        GROUP BY c.name ORDER BY revenue DESC
-      `).catch(() => ({ rows: [] })),
+        WHERE o.status != 'cancelled' ${of1.clause}
+        GROUP BY c.name ORDER BY revenue DESC`, of1.params
+      ).catch(() => ({ rows: [] })),
 
-      pool.query(`
-        SELECT COALESCE(item->'customSpecs'->>'size', item->>'size') as size,
+      pool.query(
+        `SELECT COALESCE(item->'customSpecs'->>'size', item->>'size') as size,
           SUM(COALESCE((item->>'quantity')::int, 1)) as units_sold,
           SUM((item->>'price')::int * COALESCE((item->>'quantity')::int, 1)) as revenue
         FROM orders o, jsonb_array_elements(o.items) as item
-        WHERE o.status != 'cancelled' ${orderDateFilter}
-        GROUP BY COALESCE(item->'customSpecs'->>'size', item->>'size') ORDER BY revenue DESC
-      `).catch(() => ({ rows: [] })),
+        WHERE o.status != 'cancelled' ${of1.clause}
+        GROUP BY COALESCE(item->'customSpecs'->>'size', item->>'size') ORDER BY revenue DESC`, of1.params
+      ).catch(() => ({ rows: [] })),
 
-      pool.query(`
-        SELECT COALESCE(item->'customSpecs'->>'layout', item->>'layout') as layout,
+      pool.query(
+        `SELECT COALESCE(item->'customSpecs'->>'layout', item->>'layout') as layout,
           SUM(COALESCE((item->>'quantity')::int, 1)) as units_sold,
           SUM((item->>'price')::int * COALESCE((item->>'quantity')::int, 1)) as revenue
         FROM orders o, jsonb_array_elements(o.items) as item
-        WHERE o.status != 'cancelled' ${orderDateFilter}
-        GROUP BY COALESCE(item->'customSpecs'->>'layout', item->>'layout') ORDER BY revenue DESC
-      `).catch(() => ({ rows: [] })),
+        WHERE o.status != 'cancelled' ${of1.clause}
+        GROUP BY COALESCE(item->'customSpecs'->>'layout', item->>'layout') ORDER BY revenue DESC`, of1.params
+      ).catch(() => ({ rows: [] })),
 
-      pool.query(`SELECT COUNT(*) FROM users WHERE is_admin = false AND email_verified = true ${userDateFilter}`),
+      pool.query(`SELECT COUNT(*) FROM users WHERE is_admin = false AND email_verified = true ${uf1.clause}`, uf1.params),
 
-      pool.query(`SELECT COUNT(*) FROM users WHERE is_admin = false AND email_verified = true ${hasRange ? userDateFilter : "AND created_at >= date_trunc('month', CURRENT_DATE)"}`),
+      pool.query(
+        hasRange
+          ? `SELECT COUNT(*) FROM users WHERE is_admin = false AND email_verified = true ${uf1.clause}`
+          : `SELECT COUNT(*) FROM users WHERE is_admin = false AND email_verified = true AND created_at >= date_trunc('month', CURRENT_DATE)`,
+        hasRange ? uf1.params : []
+      ),
     ]);
 
     const avgOrder = await pool.query(
-      `SELECT COALESCE(AVG(total), 0) as avg FROM orders o WHERE status != 'cancelled' AND total > 0 ${orderDateFilter}`
+      `SELECT COALESCE(AVG(total), 0) as avg FROM orders o WHERE status != 'cancelled' AND total > 0 ${of1.clause}`, of1.params
     );
 
     res.json({

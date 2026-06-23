@@ -12,6 +12,8 @@ import Logo from './Logo';
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [collectionsOpen, setCollectionsOpen] = useState(false);
+  const [collections, setCollections] = useState<any[]>([]);
   const { user, logout } = useAuth();
   const { cart } = useCart();
   const { theme, toggleTheme } = useTheme();
@@ -21,6 +23,7 @@ export default function Navbar() {
   const [showSearchDrop, setShowSearchDrop] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLFormElement>(null);
+  const collectionsRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const hideSearch = ['/admin', '/customize', '/story'].includes(location.pathname);
 
@@ -32,6 +35,13 @@ export default function Navbar() {
       }).catch(() => {});
     }
   }, [hideSearch]);
+
+  // Fetch collections for dropdown
+  useEffect(() => {
+    api.get('/api/products/collections').then(res => {
+      setCollections(Array.isArray(res.data) ? res.data : []);
+    }).catch(() => {});
+  }, []);
 
   const searchSuggestions = useMemo(() => {
     if (!searchQuery.trim()) return [];
@@ -85,9 +95,9 @@ export default function Navbar() {
     if (searchQuery.trim()) {
       const q = searchQuery.trim();
       if (q.startsWith('#')) {
-        navigate(`/shop?tag=${encodeURIComponent(q.slice(1))}`);
+        navigate(`/collection?tag=${encodeURIComponent(q.slice(1))}`);
       } else {
-        navigate(`/shop?q=${encodeURIComponent(q)}`);
+        navigate(`/collection?q=${encodeURIComponent(q)}`);
       }
       setSearchQuery('');
       setShowSearchDrop(false);
@@ -96,16 +106,16 @@ export default function Navbar() {
 
   const selectSuggestion = (s: { label: string; type: string }) => {
     if (s.type === '#tag') {
-      navigate(`/shop?tag=${encodeURIComponent(s.label)}`);
+      navigate(`/collection?tag=${encodeURIComponent(s.label)}`);
     } else {
-      navigate(`/shop?q=${encodeURIComponent(s.label)}`);
+      navigate(`/collection?q=${encodeURIComponent(s.label)}`);
     }
     setSearchQuery('');
     setShowSearchDrop(false);
   };
 
   const navLinks = [
-    { name: 'Collections', path: '/shop' },
+    { name: 'Collections', path: '/collection' },
     { name: 'Customize', path: '/customize' },
     { name: 'The Story', path: '/story' },
   ];
@@ -133,15 +143,59 @@ export default function Navbar() {
         {/* Desktop Nav */}
         <div className="hidden lg:flex items-center space-x-12">
           <div className="flex space-x-8 text-[13px] uppercase tracking-widest font-black text-z-ink">
-            {navLinks.map((link) => (
+            {/* Collections with hover dropdown */}
+            <div className="relative" ref={collectionsRef}
+              onMouseEnter={() => setCollectionsOpen(true)}
+              onMouseLeave={() => setCollectionsOpen(false)}>
               <Link
-                key={link.name}
-                to={link.path}
-                className="hover:bg-z-ink hover:text-z-paper px-3 py-1 transition-all"
+                to="/collection"
+                className="hover:bg-z-ink hover:text-z-paper px-3 py-1 transition-all inline-block"
               >
-                {link.name}
+                Collections
               </Link>
-            ))}
+              <AnimatePresence>
+                {collectionsOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-0 mt-2 w-48 bg-z-paper border-2 border-z-border shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)] z-[110]"
+                  >
+                    <Link
+                      to="/collection"
+                      onClick={() => setCollectionsOpen(false)}
+                      className="block px-4 py-2.5 text-[11px] font-mono font-black uppercase tracking-widest hover:bg-z-ink hover:text-z-paper transition-colors border-b border-z-border/10"
+                    >
+                      All
+                    </Link>
+                    {collections.map(c => (
+                      <Link
+                        key={c.id}
+                        to={`/collection?collection=${encodeURIComponent(c.name)}`}
+                        onClick={() => setCollectionsOpen(false)}
+                        className="block px-4 py-2.5 text-[11px] font-mono font-bold uppercase tracking-widest hover:bg-z-ink hover:text-z-paper transition-colors border-b border-z-border/10 last:border-0"
+                      >
+                        {c.name}
+                      </Link>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            {/* Other nav links */}
+            <Link
+              to="/customize"
+              className="hover:bg-z-ink hover:text-z-paper px-3 py-1 transition-all"
+            >
+              Customize
+            </Link>
+            <Link
+              to="/story"
+              className="hover:bg-z-ink hover:text-z-paper px-3 py-1 transition-all"
+            >
+              The Story
+            </Link>
           </div>
 
           {!hideSearch && (
@@ -171,12 +225,14 @@ export default function Navbar() {
         </div>
 
         <div className="hidden lg:flex items-center space-x-6">
+          {/* Theme toggle — disabled for now
           <button 
             onClick={toggleTheme}
             className="p-2 border-2 border-z-border bg-z-paper text-z-ink hover:bg-z-ink hover:text-z-paper transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-none translate-x-0 hover:translate-x-[2px] hover:translate-y-[2px]"
           >
             {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </button>
+          */}
 
           <Link to="/cart" className="flex items-center space-x-2 text-z-ink group">
             <motion.div 
@@ -273,12 +329,14 @@ export default function Navbar() {
 
         {/* Mobile menu and Cart button */}
         <div className="lg:hidden flex items-center space-x-4">
+          {/* Theme toggle — disabled for now
           <button 
             onClick={toggleTheme}
             className="p-2 border-2 border-z-border bg-z-paper text-z-ink hover:bg-z-ink hover:text-z-paper transition-all shadow-[2px_2px_0px_0px_var(--color-z-shadow)]"
           >
             {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
           </button>
+          */}
 
           <Link to="/cart" className="relative group">
             <motion.div 

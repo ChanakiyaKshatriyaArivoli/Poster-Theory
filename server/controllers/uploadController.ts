@@ -69,10 +69,17 @@ export const uploadDesignImage = async (req: Request, res: Response) => {
 
 export const deleteImage = async (req: Request, res: Response) => {
   const { public_id } = req.body;
-  if (!public_id) return res.status(400).json({ error: "public_id required" });
+  if (!public_id || typeof public_id !== 'string') return res.status(400).json({ error: "public_id must be a string" });
 
-  const userId = (req as any).user.id;
-  const isAdmin = (req as any).user.is_admin;
+  // Validate public_id format to prevent path traversal
+  if (public_id.includes('..') || !/^[a-zA-Z0-9/_-]+$/.test(public_id)) {
+    return res.status(400).json({ error: "Invalid public_id format" });
+  }
+
+  const userId = (req as any).user?.id;
+  const isAdmin = (req as any).user?.is_admin;
+
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
   // Non-admin users can only delete their own uploads
   if (!isAdmin && !public_id.includes(`/custom/${userId}/`)) {

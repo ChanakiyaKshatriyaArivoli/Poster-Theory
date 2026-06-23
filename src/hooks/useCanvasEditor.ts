@@ -77,13 +77,16 @@ export function useCanvasEditor() {
     };
 
     const savePreview = () => {
-      const panelLines = canvas.getObjects().filter(o => o.type === 'rect' && !o.selectable);
-      panelLines.forEach(o => o.set('visible', false));
-      canvas.renderAll();
-      const url = canvas.toDataURL({ format: 'png', multiplier: 1, quality: 1, enableRetinaScaling: false });
-      panelLines.forEach(o => o.set('visible', true));
-      canvas.renderAll();
-      setPages(prev => prev.map((p, i) => i === activePageIdx ? { ...p, previewUrl: url } : p));
+      if (canvasRef.current !== canvas) return; // canvas was disposed/replaced
+      try {
+        const panelLines = canvas.getObjects().filter(o => o.type === 'rect' && !o.selectable);
+        panelLines.forEach(o => o.set('visible', false));
+        canvas.renderAll();
+        const url = canvas.toDataURL({ format: 'png', multiplier: 1, quality: 1, enableRetinaScaling: false });
+        panelLines.forEach(o => o.set('visible', true));
+        canvas.renderAll();
+        setPages(prev => prev.map((p, i) => i === activePageIdx ? { ...p, previewUrl: url } : p));
+      } catch { /* canvas disposed mid-operation */ }
     };
 
     canvas.on('object:scaling', updateDims);
@@ -99,8 +102,10 @@ export function useCanvasEditor() {
 
     if (activePage.imageDataUrl) {
       setTimeout(() => {
+        if (canvasRef.current !== canvas) return; // canvas was replaced
         placeImageOnCanvas(canvas, activePage.imageDataUrl!, activePage.printStyle);
         setTimeout(() => {
+          if (canvasRef.current !== canvas) return; // canvas was replaced
           drawPanelLines(canvas, activePage.panelCount, dims.width, dims.height, activePage.splitDirection);
           savePreview();
         }, 80);
@@ -185,13 +190,16 @@ export function useCanvasEditor() {
     canvas.renderAll();
 
     setTimeout(() => {
-      const panelLines = canvas.getObjects().filter(o => o.type === 'rect' && !o.selectable);
-      panelLines.forEach(o => o.set('visible', false));
-      canvas.renderAll();
-      const url = canvas.toDataURL({ format: 'png', multiplier: 1, quality: 1, enableRetinaScaling: false });
-      panelLines.forEach(o => o.set('visible', true));
-      canvas.renderAll();
-      setPages(prev => prev.map((p, i) => i === activePageIdx ? { ...p, previewUrl: url } : p));
+      if (canvasRef.current !== canvas) return; // canvas was replaced
+      try {
+        const panelLines = canvas.getObjects().filter(o => o.type === 'rect' && !o.selectable);
+        panelLines.forEach(o => o.set('visible', false));
+        canvas.renderAll();
+        const url = canvas.toDataURL({ format: 'png', multiplier: 1, quality: 1, enableRetinaScaling: false });
+        panelLines.forEach(o => o.set('visible', true));
+        canvas.renderAll();
+        setPages(prev => prev.map((p, i) => i === activePageIdx ? { ...p, previewUrl: url } : p));
+      } catch { /* canvas disposed */ }
     }, 100);
   };
 
@@ -213,9 +221,14 @@ export function useCanvasEditor() {
 
   const handleImageUpload = (file: File) => {
     if (!canvasRef.current || !activePage) return;
+    // Validate file type before reading
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) return;
     const reader = new FileReader();
     reader.onload = async () => {
       const dataUrl = reader.result as string;
+      // Validate data URL is a safe image format before assigning to img.src
+      if (!dataUrl || !/^data:image\/(jpeg|png|webp|gif);base64,/.test(dataUrl)) return;
       const canvas = canvasRef.current!;
       const tempImg = new Image();
       tempImg.onload = async () => {
@@ -329,13 +342,15 @@ export function useCanvasEditor() {
   const savePreview = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const panelLines = canvas.getObjects().filter(o => o.type === 'rect' && !o.selectable);
-    panelLines.forEach(o => o.set('visible', false));
-    canvas.renderAll();
-    const url = canvas.toDataURL({ format: 'png', multiplier: 1, quality: 1, enableRetinaScaling: false });
-    panelLines.forEach(o => o.set('visible', true));
-    canvas.renderAll();
-    setPages(prev => prev.map((p, i) => i === activePageIdx ? { ...p, previewUrl: url } : p));
+    try {
+      const panelLines = canvas.getObjects().filter(o => o.type === 'rect' && !o.selectable);
+      panelLines.forEach(o => o.set('visible', false));
+      canvas.renderAll();
+      const url = canvas.toDataURL({ format: 'png', multiplier: 1, quality: 1, enableRetinaScaling: false });
+      panelLines.forEach(o => o.set('visible', true));
+      canvas.renderAll();
+      setPages(prev => prev.map((p, i) => i === activePageIdx ? { ...p, previewUrl: url } : p));
+    } catch { /* canvas may have been disposed */ }
   };
 
   const rotateCW = () => { const o = getImageObject(); if (o) { o.rotate((o.angle || 0) + 90); canvasRef.current?.renderAll(); savePreview(); } };
@@ -373,11 +388,13 @@ export function useCanvasEditor() {
     canvas.renderAll();
 
     const sanitized = (activePage.fileName || 'print').replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\.\./g, '').trim().slice(0, 80) || 'print';
+    const safeSize = (activePage.size || '').replace(/[^a-zA-Z0-9]/g, '');
+    const safeOrientation = (activePage.orientation || '').replace(/[^a-zA-Z]/g, '');
 
     // Single panel — direct PNG download
     if (activePage.panelCount <= 1) {
       const link = document.createElement('a');
-      link.download = `${sanitized}_${activePage.size}_${activePage.orientation}_300dpi.png`;
+      link.download = `${sanitized}_${safeSize}_${safeOrientation}_300dpi.png`;
       link.href = dataUrl;
       link.click();
       return;
@@ -420,7 +437,7 @@ export function useCanvasEditor() {
     const zipBlob = await zip.generateAsync({ type: 'blob' });
     const url = URL.createObjectURL(zipBlob);
     const link = document.createElement('a');
-    link.download = `${sanitized}_${activePage.size}_${activePage.orientation}_${activePage.panelCount}panel_300dpi.zip`;
+    link.download = `${sanitized}_${safeSize}_${safeOrientation}_${activePage.panelCount}panel_300dpi.zip`;
     link.href = url;
     link.click();
     URL.revokeObjectURL(url);

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Edit2, Upload, Image } from 'lucide-react';
 import api from '../../lib/api';
 import { h, useAction, Spinner } from './shared';
@@ -129,7 +129,7 @@ export default function HomepageTab({ token }: { token: string | null }) {
       const savedCats: any[] = c.data?.collections || [];
       const mergedCats = dbCollections.map(dbCat => {
         const saved = savedCats.find((s: any) => s.name === dbCat.name);
-        return { name: dbCat.name, img: saved?.img || '', path: `/shop?category=${dbCat.name}` };
+        return { name: dbCat.name, img: saved?.img || '', path: `/collection?category=${dbCat.name}` };
       });
       return (
         <div className="mt-3">

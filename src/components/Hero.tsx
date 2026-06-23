@@ -79,7 +79,7 @@ export default function Hero() {
             </div>
             
             <div className="flex flex-wrap gap-4">
-              <Link to="/shop" className="sticker-btn bg-z-ink text-z-paper text-sm sm:text-base">
+              <Link to="/collection" className="sticker-btn bg-z-ink text-z-paper text-sm sm:text-base">
                 VIEW_POSTERS_
               </Link>
             </div>
