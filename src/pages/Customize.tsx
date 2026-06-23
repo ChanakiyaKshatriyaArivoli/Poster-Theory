@@ -34,6 +34,19 @@ export default function Customize() {
   const editor = useCanvasEditor();
   const { activePage, pages, activePageIdx, dims, paperMm, filledPages, saving, previewMode, imageDims, canvasElRef, fileInputRef } = editor;
 
+  // Calculate scale for mobile
+  const [canvasScale, setCanvasScale] = useState(1);
+  useEffect(() => {
+    const updateScale = () => {
+      const available = window.innerWidth - 32; // px-4 = 16px each side
+      const needed = dims.width + 40;
+      setCanvasScale(Math.min(1, available / needed));
+    };
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [dims.width]);
+
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) editor.handleImageUpload(file);
@@ -322,8 +335,8 @@ export default function Customize() {
                   {paperMm.w}&times;{paperMm.h} mm per sheet
                 </div>
 
-                <div className="bg-gray-200 flex items-center justify-center p-3 sm:p-5 transition-all relative overflow-x-auto max-w-full"
-                  style={{ width: dims.width + 40, height: dims.height + 40 }}
+                <div className="bg-gray-200 flex items-center justify-center p-2 sm:p-5 transition-all relative w-full"
+                  style={{ width: ``${(dims.width + 40) * canvasScale}px``, height: ``${(dims.height + 40) * canvasScale}px`` }}
                   onDragOver={(e) => {
                     if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.stopPropagation(); }
                   }}
@@ -333,7 +346,7 @@ export default function Customize() {
                     const file = e.dataTransfer.files[0];
                     if (file && file.type.startsWith('image/')) editor.handleImageUpload(file);
                   }}>
-                  <div className="shadow-[0_2px_16px_rgba(0,0,0,0.12)]">
+                  <div className="shadow-[0_2px_16px_rgba(0,0,0,0.12)]" style={{ transform: `scale(${canvasScale})`, transformOrigin: 'top left' }}>
                     <canvas ref={canvasElRef} />
                   </div>
                 </div>
@@ -407,8 +420,8 @@ export default function Customize() {
                   )}
                 </div>
 
-                <div className="bg-gray-200 flex items-center justify-center p-3 sm:p-5 transition-all relative overflow-x-auto max-w-full"
-                  style={{ width: dims.width + 40, height: dims.height + 40 }}
+                <div className="bg-gray-200 flex items-center justify-center p-2 sm:p-5 transition-all relative w-full"
+                  style={{ width: ``${(dims.width + 40) * canvasScale}px``, height: ``${(dims.height + 40) * canvasScale}px`` }}
                   onDragOver={(e) => {
                     if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.stopPropagation(); }
                   }}
@@ -418,7 +431,7 @@ export default function Customize() {
                     const file = e.dataTransfer.files[0];
                     if (file && file.type.startsWith('image/')) editor.handleImageUpload(file);
                   }}>
-                  <div className="shadow-[0_2px_16px_rgba(0,0,0,0.12)]">
+                  <div className="shadow-[0_2px_16px_rgba(0,0,0,0.12)]" style={{ transform: `scale(${canvasScale})`, transformOrigin: 'top left' }}>
                     <canvas ref={canvasElRef} />
                   </div>
                 </div>
@@ -466,4 +479,5 @@ export default function Customize() {
     </div>
   );
 }
+
 
