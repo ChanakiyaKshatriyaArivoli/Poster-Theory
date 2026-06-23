@@ -336,7 +336,7 @@ export default function Customize() {
                 </div>
 
                 <div className="bg-gray-200 flex items-center justify-center p-2 sm:p-5 transition-all relative w-full"
-                  style={{ width: ``${(dims.width + 40) * canvasScale}px``, height: ``${(dims.height + 40) * canvasScale}px`` }}
+                  style={{ width: `${(dims.width + 40) * canvasScale}px`, height: `${(dims.height + 40) * canvasScale}px` }}
                   onDragOver={(e) => {
                     if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.stopPropagation(); }
                   }}
@@ -421,7 +421,7 @@ export default function Customize() {
                 </div>
 
                 <div className="bg-gray-200 flex items-center justify-center p-2 sm:p-5 transition-all relative w-full"
-                  style={{ width: ``${(dims.width + 40) * canvasScale}px``, height: ``${(dims.height + 40) * canvasScale}px`` }}
+                  style={{ width: `${(dims.width + 40) * canvasScale}px`, height: `${(dims.height + 40) * canvasScale}px` }}
                   onDragOver={(e) => {
                     if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.stopPropagation(); }
                   }}
