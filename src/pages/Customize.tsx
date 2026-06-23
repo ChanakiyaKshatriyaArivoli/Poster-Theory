@@ -100,7 +100,11 @@ export default function Customize() {
   };
 
   return (
-    <div className="pt-24 sm:pt-40 pb-32 min-h-screen px-6">
+    <div className="pt-24 sm:pt-40 pb-32 min-h-screen px-4 sm:px-6">
+      {/* Mobile Notice */}
+      <div className="lg:hidden mb-4 bg-amber-50 border-2 border-amber-300 p-3 text-center">
+        <p className="text-[11px] font-mono font-bold text-amber-800 uppercase">Switch to desktop for a better editing experience</p>
+      </div>
       {/* Tutorial Overlay */}
       {showTutorial && (
         <div className="fixed inset-0 z-[300] bg-black/70 backdrop-blur-sm flex items-center justify-center p-6">
@@ -136,14 +140,14 @@ export default function Customize() {
 
       <div className="max-w-[1600px] mx-auto">
         {/* Header */}
-        <header className="mb-12 border-b-4 border-z-border pb-10 flex flex-col md:flex-row md:items-end justify-between">
+        <header className="mb-6 sm:mb-12 border-b-4 border-z-border pb-6 sm:pb-10 flex flex-col md:flex-row md:items-end justify-between">
           <div>
-            <p className="text-[13px] font-mono uppercase tracking-[0.5em] text-z-ink font-black mb-4">Custom_Print_Studio</p>
-            <h1 className="font-display font-black text-6xl md:text-8xl uppercase tracking-tighter leading-none italic">
+            <p className="text-[11px] sm:text-[13px] font-mono uppercase tracking-[0.3em] sm:tracking-[0.5em] text-z-ink font-black mb-2 sm:mb-4">Custom_Print_Studio</p>
+            <h1 className="font-display font-black text-4xl sm:text-6xl md:text-8xl uppercase tracking-tighter leading-none italic">
               <span className="text-outline">Design</span>_Lab
             </h1>
           </div>
-          <Logo size="md" className="mt-8 md:mt-0" />
+          <Logo size="md" className="mt-4 md:mt-0 hidden sm:block" />
         </header>
 
         {/* Preview Floating Window */}
@@ -248,13 +252,13 @@ export default function Customize() {
         )}
 
         {/* New Page Bar */}
-        <div className="bg-z-paper border-2 border-z-border p-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)] mb-6">
-          <div className="flex items-center justify-between">
+        <div className="bg-z-paper border-2 border-z-border p-3 sm:p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.2)] mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
-              <p className="text-[13px] font-display font-black uppercase tracking-tight text-z-ink">Upload your image & customize the print</p>
-              <p className="text-[11px] font-mono text-z-ink/60 dark:text-z-ink/70 uppercase tracking-wider mt-1">Choose size, orientation & style after adding a page</p>
+              <p className="text-[11px] sm:text-[13px] font-display font-black uppercase tracking-tight text-z-ink">Upload your image & customize</p>
+              <p className="text-[9px] sm:text-[11px] font-mono text-z-ink/60 dark:text-z-ink/70 uppercase tracking-wider mt-1">Choose size, orientation & style after adding a page</p>
             </div>
-            <button onClick={() => editor.addPage()} className="sticker-btn bg-z-ink text-z-paper text-[11px] px-5 py-2.5 inline-flex items-center gap-2 active:scale-95">
+            <button onClick={() => editor.addPage()} className="sticker-btn bg-z-ink text-z-paper text-[10px] sm:text-[11px] px-4 sm:px-5 py-2 sm:py-2.5 inline-flex items-center gap-2 active:scale-95 w-full sm:w-auto justify-center">
               <ImagePlus className="w-4 h-4" /> ADD IMAGE
             </button>
           </div>
@@ -262,7 +266,7 @@ export default function Customize() {
 
         {/* Page Tabs */}
         {pages.length > 0 && (
-          <div className="flex gap-2 flex-wrap mb-6">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 mb-4 sm:mb-6">
             {pages.map((page, idx) => (
               <button key={page.id} onClick={() => editor.setActivePageIdx(idx)}
                 className={`px-4 py-2 text-[11px] font-mono font-black uppercase border-2 transition-all flex items-center gap-2 active:scale-95 ${
@@ -318,7 +322,7 @@ export default function Customize() {
                   {paperMm.w}&times;{paperMm.h} mm per sheet
                 </div>
 
-                <div className="bg-gray-200 flex items-center justify-center p-5 transition-all relative"
+                <div className="bg-gray-200 flex items-center justify-center p-3 sm:p-5 transition-all relative overflow-x-auto max-w-full"
                   style={{ width: dims.width + 40, height: dims.height + 40 }}
                   onDragOver={(e) => {
                     if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.stopPropagation(); }
@@ -403,7 +407,7 @@ export default function Customize() {
                   )}
                 </div>
 
-                <div className="bg-gray-200 flex items-center justify-center p-5 transition-all relative"
+                <div className="bg-gray-200 flex items-center justify-center p-3 sm:p-5 transition-all relative overflow-x-auto max-w-full"
                   style={{ width: dims.width + 40, height: dims.height + 40 }}
                   onDragOver={(e) => {
                     if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.stopPropagation(); }
