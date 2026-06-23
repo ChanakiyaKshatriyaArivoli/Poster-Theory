@@ -74,7 +74,7 @@ export default function Home() {
       <div className="group">
         <div className="flex gap-6 animate-marquee-scroll hover:[animation-play-state:paused] md:[animation-play-state:running] [animation-play-state:paused] md:animate-marquee-scroll overflow-x-auto md:overflow-visible scrollbar-hide px-6 md:px-0">
           {[...items, ...items].map((p: any, idx: number) => (
-            <div key={`${p.id}-${idx}`} className="w-48 sm:w-56 shrink-0">
+            <div key={`${p.id}-${idx}`} className="w-36 sm:w-48 md:w-56 shrink-0">
               <ProductCard {...p} />
             </div>
           ))}
@@ -134,7 +134,7 @@ export default function Home() {
             <div className="flex gap-6 animate-marquee-scroll hover:[animation-play-state:paused] md:[animation-play-state:running] [animation-play-state:paused] md:animate-marquee-scroll overflow-x-auto md:overflow-visible scrollbar-hide px-6 md:px-0">
               {[...collections, ...collections].map((cat, idx) => (
                 <Link key={idx} to={cat.path} className="shrink-0 group/card flex flex-col items-center">
-                  <div className="w-48 sm:w-56 aspect-[3/4] overflow-hidden border-2 border-z-border group-hover/card:border-z-ink transition-all relative">
+                  <div className="w-36 sm:w-48 md:w-56 aspect-[3/4] overflow-hidden border-2 border-z-border group-hover/card:border-z-ink transition-all relative">
                     {cat.img ? (
                       <img src={cat.img} alt={cat.name} loading="lazy" className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" />
                     ) : (
