@@ -2,18 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
 import Logo from './Logo';
 import api from '../lib/api';
 
 const FALLBACK_IMAGES = [
-  { url: '/uploads/hero/placeholder.png', ref: '001//POSTER_THEORY' },
+  { url: '/uploads/hero/placeholder.png', ref: '001' },
 ];
 
 export default function Hero() {
   const [images, setImages] = useState(FALLBACK_IMAGES);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { theme } = useTheme();
 
   useEffect(() => {
     api.get('/api/products/homepage').then(res => {
@@ -28,7 +26,7 @@ export default function Hero() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
-    }, 5000);
+    }, 4000);
     return () => clearInterval(timer);
   }, [images.length]);
 
@@ -36,107 +34,121 @@ export default function Hero() {
   const prev = () => setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
 
   return (
-    <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden px-6 py-32">
-      {/* Background Poster Text */}
-      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 opacity-[0.05] select-none pointer-events-none whitespace-nowrap overflow-hidden">
-        <p className="poster-title leading-none tracking-tighter -translate-x-[5%] text-outline">
-          POSTER THEORY* POSTER THEORY*
-        </p>
-      </div>
+    <section className="relative min-h-[90vh] w-full flex items-center overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white" />
 
-      <div className="max-w-[1440px] w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
-        {/* Left Content */}
-        <div className="lg:col-span-7 flex flex-col items-start">
+      <div className="max-w-[1440px] w-full mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+        {/* Left — Text Content */}
+        <div className="flex flex-col items-start">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-z-ink text-z-paper px-4 py-1.5 sm:px-6 sm:py-2 font-mono text-[11px] sm:text-[13px] mb-6 sm:mb-8 font-bold uppercase tracking-widest"
-          >
-            VOL. 02 // POSTER_COLLECTION.2024
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mb-10 sm:mb-16 w-full max-w-[1000px] flex items-start"
+            className="mb-8"
           >
             <Logo size="hero" />
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="font-display font-black text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tighter text-z-ink leading-[0.9] mb-6"
+          >
+            Premium Posters<br/>
+            <span className="text-z-muted">For Your Walls</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="text-[13px] sm:text-[14px] font-mono text-z-muted leading-relaxed mb-8 max-w-md"
+          >
+            Curated poster prints in Anime, Movies, Music, Minimal & more. Available in A3 to Pocket sizes. Printed on 300 GSM matte paper.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="flex flex-wrap gap-4"
+          >
+            <Link to="/collection" className="px-8 py-3 bg-z-ink text-white font-mono text-[12px] font-bold uppercase tracking-widest hover:bg-z-ink/80 transition-colors">
+              Shop Now
+            </Link>
+            <Link to="/customize" className="px-8 py-3 border-2 border-z-ink text-z-ink font-mono text-[12px] font-bold uppercase tracking-widest hover:bg-z-ink hover:text-white transition-all">
+              Custom Print
+            </Link>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-col md:flex-row items-start md:items-center gap-6 sm:gap-8 w-full"
+            transition={{ delay: 0.6 }}
+            className="flex items-center gap-6 mt-10 pt-8 border-t border-z-border/50"
           >
-            <div className="max-w-[280px] sm:max-w-[320px]">
-              <p className="text-[12px] sm:text-sm font-mono uppercase tracking-widest text-z-muted leading-relaxed font-bold border-l-2 border-z-border pl-4 sm:pl-6">
-                [POSTER_ARCHIVE_EXHIBIT]
-                <br/>
-                High-definition prints and curative posters for the digital generation.
-              </p>
+            <div>
+              <p className="font-display font-black text-2xl text-z-ink">500+</p>
+              <p className="text-[9px] font-mono text-z-muted uppercase">Happy Customers</p>
             </div>
-            
-            <div className="flex flex-wrap gap-4">
-              <Link to="/collection" className="sticker-btn bg-z-ink text-z-paper text-sm sm:text-base">
-                VIEW_POSTERS_
-              </Link>
+            <div className="w-px h-8 bg-z-border" />
+            <div>
+              <p className="font-display font-black text-2xl text-z-ink">6</p>
+              <p className="text-[9px] font-mono text-z-muted uppercase">Print Sizes</p>
+            </div>
+            <div className="w-px h-8 bg-z-border" />
+            <div>
+              <p className="font-display font-black text-2xl text-z-ink">₹69</p>
+              <p className="text-[9px] font-mono text-z-muted uppercase">Starting At</p>
             </div>
           </motion.div>
         </div>
 
-        {/* Right Art Display (Polaroid Carousel) */}
-        <div className="lg:col-span-5 relative h-[400px] sm:h-[500px] flex items-center justify-center">
-          <div className="relative w-full max-w-sm h-[480px]">
-            <AnimatePresence mode="popLayout">
-              <motion.div 
+        {/* Right — Poster Carousel */}
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+          className="relative flex items-center justify-center"
+        >
+          <div className="relative w-full max-w-md aspect-[3/4]">
+            <AnimatePresence mode="wait">
+              <motion.img
                 key={currentIndex}
-                initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
-                animate={{ opacity: 1, scale: 1, rotate: currentIndex % 2 === 0 ? -3 : 3 }}
-                exit={{ opacity: 0, scale: 1.1, rotate: 0 }}
-                transition={{ 
-                  duration: 0.8, 
-                  type: 'spring', 
-                  stiffness: 70, 
-                  damping: 15 
-                }}
-                className="polaroid absolute inset-0 z-20 w-full p-1 border-[1px] border-z-border shadow-[4px_4px_0px_0px_var(--color-z-shadow)]"
-              >
-                <div className="tape -top-2 left-1/2 -translate-x-1/2 w-24 h-4 opacity-40 group-hover:opacity-100 transition-opacity z-30" />
-                <img 
-                  src={images[currentIndex].url} 
-                  alt={`Carousel ${currentIndex}`} 
-                  className="w-full aspect-[4/5] object-cover bg-z-paper" 
-                  loading="lazy"
-                />
-                <div className="mt-2 flex justify-between items-center border-t border-z-border pt-4 px-4 pb-2">
-                   <p className="font-mono text-[11px] font-bold uppercase tracking-tight opacity-70">REF: {images[currentIndex].ref}</p>
-                   <div className="flex space-x-1">
-                      <button onClick={(e) => { e.preventDefault(); prev(); }} className="hover:bg-z-ink hover:text-z-paper transition-all p-1 border border-transparent hover:border-z-border">
-                        <ChevronLeft className="w-3 h-3" />
-                      </button>
-                      <button onClick={(e) => { e.preventDefault(); next(); }} className="hover:bg-z-ink hover:text-z-paper transition-all p-1 border border-transparent hover:border-z-border">
-                        <ChevronRight className="w-3 h-3" />
-                      </button>
-                   </div>
-                </div>
-              </motion.div>
+                src={images[currentIndex].url}
+                alt="Featured poster"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                transition={{ duration: 0.5 }}
+                className="w-full h-full object-cover border-2 border-z-border shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)]"
+              />
             </AnimatePresence>
 
-            {/* Background stack decoration */}
-            <div className="absolute top-4 left-4 w-full h-full border-2 border-z-border -z-10 rotate-2 bg-z-paper opacity-50" />
-            <div className="absolute top-2 left-2 w-full h-full border-2 border-z-border -z-20 -rotate-3 bg-z-paper opacity-30" />
-          </div>
+            {/* Navigation */}
+            {images.length > 1 && (
+              <div className="absolute bottom-4 right-4 flex gap-2">
+                <button onClick={prev} className="w-8 h-8 bg-white/90 border border-z-border flex items-center justify-center hover:bg-z-ink hover:text-white transition-all">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button onClick={next} className="w-8 h-8 bg-white/90 border border-z-border flex items-center justify-center hover:bg-z-ink hover:text-white transition-all">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
 
-          <motion.div
-            animate={{ rotate: [0, 5, 0] }}
-            transition={{ duration: 4, repeat: Infinity }}
-            className="absolute -top-10 -right-10 w-40 h-40 bg-z-accent text-z-paper rounded-full flex items-center justify-center text-center p-6 border-2 border-z-border shadow-lg dark:shadow-white/10 font-display font-bold text-[13px] uppercase leading-tight z-30"
-          >
-            New<br/>Full Color<br/>Drop
-          </motion.div>
-        </div>
+            {/* Dots */}
+            {images.length > 1 && (
+              <div className="absolute bottom-4 left-4 flex gap-1.5">
+                {images.map((_, idx) => (
+                  <button key={idx} onClick={() => setCurrentIndex(idx)}
+                    className={`w-2 h-2 rounded-full transition-all ${idx === currentIndex ? 'bg-z-ink w-6' : 'bg-z-ink/30'}`} />
+                ))}
+              </div>
+            )}
+          </div>
+        </motion.div>
       </div>
     </section>
   );

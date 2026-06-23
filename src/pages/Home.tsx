@@ -3,8 +3,8 @@ import { motion } from 'motion/react';
 import api from '../lib/api';
 import { Link } from 'react-router-dom';
 import Hero from '../components/Hero';
-import QuoteMarquee from '../components/QuoteMarquee';
 import ProductCard from '../components/ProductCard';
+import { Truck, Shield, RotateCcw, Palette } from 'lucide-react';
 
 interface SectionConfig {
   limit: number;
@@ -26,7 +26,6 @@ export default function Home() {
   });
 
   useEffect(() => {
-    // Fetch homepage config first to get limits
     Promise.all([
       api.get('/api/products/collections'),
       api.get('/api/products/homepage'),
@@ -40,7 +39,6 @@ export default function Home() {
       setCollections(merged);
       if (hpRes.data?.about_image?.url) setAboutImage(hpRes.data.about_image.url);
 
-      // Get limits from config
       const limits: Record<string, SectionConfig> = {
         new_arrivals: hpRes.data?.new_arrivals || { limit: 8, enabled: true },
         trending: hpRes.data?.trending || { limit: 8, enabled: true },
@@ -49,24 +47,12 @@ export default function Home() {
       };
       setSectionLimits(limits);
 
-      // Fetch each section with its limit
-      if (limits.new_arrivals.enabled) {
-        api.get(`/api/products?filter=new_arrival&limit=${limits.new_arrivals.limit}`).then(r => setNewArrivals(Array.isArray(r.data) ? r.data : [])).catch(() => {});
-      }
-      if (limits.trending.enabled) {
-        api.get(`/api/products?filter=trending&limit=${limits.trending.limit}`).then(r => setTrending(Array.isArray(r.data) ? r.data : [])).catch(() => {});
-      }
-      if (limits.featured.enabled) {
-        api.get(`/api/products?filter=featured&limit=${limits.featured.limit}`).then(r => setFeatured(Array.isArray(r.data) ? r.data : [])).catch(() => {});
-      }
-      if (limits.bestseller.enabled) {
-        api.get(`/api/products?filter=bestseller&limit=${limits.bestseller.limit}`).then(r => setBestsellers(Array.isArray(r.data) ? r.data : [])).catch(() => {});
-      }
+      if (limits.new_arrivals.enabled) api.get(`/api/products?filter=new_arrival&limit=${limits.new_arrivals.limit}`).then(r => setNewArrivals(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+      if (limits.trending.enabled) api.get(`/api/products?filter=trending&limit=${limits.trending.limit}`).then(r => setTrending(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+      if (limits.featured.enabled) api.get(`/api/products?filter=featured&limit=${limits.featured.limit}`).then(r => setFeatured(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+      if (limits.bestseller.enabled) api.get(`/api/products?filter=bestseller&limit=${limits.bestseller.limit}`).then(r => setBestsellers(Array.isArray(r.data) ? r.data : [])).catch(() => {});
     }).catch(() => {
-      // Fallback: fetch without config
-      api.get('/api/products/collections').then(r => {
-        if (Array.isArray(r.data)) setCollections(r.data.map((c: any) => ({ name: c.name, img: '', path: `/collection?collection=${c.name}` })));
-      }).catch(() => {});
+      api.get('/api/products/collections').then(r => { if (Array.isArray(r.data)) setCollections(r.data.map((c: any) => ({ name: c.name, img: '', path: `/collection?collection=${c.name}` }))); }).catch(() => {});
       api.get('/api/products?filter=new_arrival&limit=8').then(r => setNewArrivals(Array.isArray(r.data) ? r.data : [])).catch(() => {});
       api.get('/api/products?filter=trending&limit=8').then(r => setTrending(Array.isArray(r.data) ? r.data : [])).catch(() => {});
       api.get('/api/products?filter=featured&limit=8').then(r => setFeatured(Array.isArray(r.data) ? r.data : [])).catch(() => {});
@@ -74,14 +60,16 @@ export default function Home() {
     });
   }, []);
 
-  const MarqueeSection = ({ items, label, title, statusLink }: { items: any[]; label: string; title: string; statusLink: string }) => (
-    <section className="w-full py-16 sm:py-24 border-b-2 border-z-border overflow-hidden">
-      <div className="max-w-[1600px] mx-auto px-6 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+  const ProductMarquee = ({ items, title, subtitle, link }: { items: any[]; title: string; subtitle: string; link: string }) => (
+    <section className="py-16 sm:py-24 border-b-2 border-z-border overflow-hidden">
+      <div className="max-w-[1440px] mx-auto px-6 mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <p className="text-[12px] font-mono uppercase tracking-[0.4em] text-z-muted font-black mb-3">{label}</p>
-          <h2 className="font-display font-black text-4xl sm:text-6xl uppercase tracking-tighter text-z-ink leading-none">{title}</h2>
+          <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-z-muted font-bold mb-2">{subtitle}</p>
+          <h2 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter text-z-ink">{title}</h2>
         </div>
-        <Link to={`/collection?status=${statusLink}`} className="sticker-btn bg-z-ink text-white whitespace-nowrap">View All</Link>
+        <Link to={link} className="text-[12px] font-mono font-bold uppercase tracking-widest text-z-ink border-b-2 border-z-ink hover:text-z-muted hover:border-z-muted transition-colors pb-1">
+          View All →
+        </Link>
       </div>
       <div className="group">
         <div className="flex gap-6 animate-marquee-scroll hover:[animation-play-state:paused] md:[animation-play-state:running] [animation-play-state:paused] md:animate-marquee-scroll overflow-x-auto md:overflow-visible scrollbar-hide px-6 md:px-0">
@@ -98,156 +86,186 @@ export default function Home() {
   return (
     <div className="pt-20">
       <Hero />
-      <QuoteMarquee />
 
-      {/* Stats / Social Proof Banner */}
-      <section className="border-y-2 border-z-border bg-z-ink text-z-paper py-6">
-        <div className="max-w-[1600px] mx-auto px-6 flex flex-wrap items-center justify-center gap-8 sm:gap-16 text-center">
-          <div>
-            <p className="font-display font-black text-3xl sm:text-5xl tracking-tighter">500+</p>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-z-paper/60 mt-1">Walls Transformed</p>
+      {/* Trust Bar */}
+      <section className="border-y-2 border-z-border py-5 bg-z-paper">
+        <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="flex items-center gap-3">
+            <Truck className="w-5 h-5 text-z-ink shrink-0" />
+            <div>
+              <p className="text-[11px] font-mono font-bold uppercase text-z-ink">Free Shipping</p>
+              <p className="text-[9px] font-mono text-z-muted uppercase">Orders above ₹499</p>
+            </div>
           </div>
-          <div className="w-px h-10 bg-z-paper/20 hidden sm:block" />
-          <div>
-            <p className="font-display font-black text-3xl sm:text-5xl tracking-tighter">50+</p>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-z-paper/60 mt-1">Unique Designs</p>
+          <div className="flex items-center gap-3">
+            <Shield className="w-5 h-5 text-z-ink shrink-0" />
+            <div>
+              <p className="text-[11px] font-mono font-bold uppercase text-z-ink">Premium Quality</p>
+              <p className="text-[9px] font-mono text-z-muted uppercase">300 GSM Matte Paper</p>
+            </div>
           </div>
-          <div className="w-px h-10 bg-z-paper/20 hidden sm:block" />
-          <div>
-            <p className="font-display font-black text-3xl sm:text-5xl tracking-tighter">6</p>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-z-paper/60 mt-1">Print Sizes</p>
+          <div className="flex items-center gap-3">
+            <RotateCcw className="w-5 h-5 text-z-ink shrink-0" />
+            <div>
+              <p className="text-[11px] font-mono font-bold uppercase text-z-ink">Easy Returns</p>
+              <p className="text-[9px] font-mono text-z-muted uppercase">7 day return policy</p>
+            </div>
           </div>
-          <div className="w-px h-10 bg-z-paper/20 hidden sm:block" />
-          <div>
-            <p className="font-display font-black text-3xl sm:text-5xl tracking-tighter">∞</p>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-z-paper/60 mt-1">Custom Prints</p>
+          <div className="flex items-center gap-3">
+            <Palette className="w-5 h-5 text-z-ink shrink-0" />
+            <div>
+              <p className="text-[11px] font-mono font-bold uppercase text-z-ink">Custom Prints</p>
+              <p className="text-[9px] font-mono text-z-muted uppercase">Upload your own design</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Collections Marquee */}
+      {/* Shop by Collection — Marquee */}
       {collections.length > 0 && (
-        <section className="w-full py-16 sm:py-24 border-b-2 border-z-border bg-z-paper/50 overflow-hidden">
-          <div className="max-w-[1600px] mx-auto px-6 mb-10">
-            <p className="text-[12px] font-mono uppercase tracking-[0.4em] text-z-muted font-black mb-3">Browse By</p>
-            <h2 className="font-display font-black text-4xl sm:text-6xl uppercase tracking-tighter text-z-ink leading-none">Collections</h2>
+        <section className="py-16 sm:py-24 border-b-2 border-z-border overflow-hidden bg-gray-50">
+          <div className="max-w-[1440px] mx-auto px-6 mb-10">
+            <div className="text-center">
+              <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-z-muted font-bold mb-2">Browse By</p>
+              <h2 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter text-z-ink">Collections</h2>
+            </div>
           </div>
           <div className="group">
             <div className="flex gap-6 animate-marquee-scroll hover:[animation-play-state:paused] md:[animation-play-state:running] [animation-play-state:paused] md:animate-marquee-scroll overflow-x-auto md:overflow-visible scrollbar-hide px-6 md:px-0">
               {[...collections, ...collections].map((cat, idx) => (
-                <Link key={idx} to={cat.path} className="snap-center min-w-[200px] sm:min-w-[250px] flex flex-col items-center shrink-0 group/card">
-                  <div className="w-48 sm:w-56 aspect-[210/297] overflow-hidden border-2 border-z-border group-hover/card:border-z-ink transition-all shadow-[4px_4px_0px_0px_var(--color-z-shadow)] group-hover/card:shadow-none group-hover/card:translate-x-[2px] group-hover/card:translate-y-[2px]">
+                <Link key={idx} to={cat.path} className="shrink-0 group/card flex flex-col items-center">
+                  <div className="w-48 sm:w-56 aspect-[3/4] overflow-hidden border-2 border-z-border group-hover/card:border-z-ink transition-all relative">
                     {cat.img ? (
                       <img src={cat.img} alt={cat.name} loading="lazy" className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" />
                     ) : (
                       <div className="w-full h-full bg-z-border/10 flex items-center justify-center">
-                        <span className="text-[10px] font-mono text-z-ink/20 uppercase">{cat.name[0]}</span>
+                        <span className="font-display font-black text-4xl text-z-ink/10 uppercase">{cat.name[0]}</span>
                       </div>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <h3 className="font-display font-bold text-base sm:text-lg uppercase tracking-tighter text-white">{cat.name}</h3>
+                    </div>
                   </div>
-                  <h3 className="mt-3 font-display font-bold text-sm sm:text-base uppercase tracking-tighter text-z-ink text-center">{cat.name}</h3>
                 </Link>
               ))}
             </div>
           </div>
-          <div className="max-w-[1600px] mx-auto px-6 mt-10 flex justify-center">
-            <Link to="/collection" className="sticker-btn bg-z-ink text-white">All Collections</Link>
+          <div className="text-center mt-10">
+            <Link to="/collection" className="inline-block px-8 py-3 bg-z-ink text-white font-mono text-[12px] font-bold uppercase tracking-widest hover:bg-z-ink/80 transition-colors">
+              View All Collections
+            </Link>
           </div>
         </section>
       )}
 
-      {/* Design Your Own CTA */}
+      {/* How It Works */}
       <section className="py-16 sm:py-24 px-6 border-b-2 border-z-border">
         <div className="max-w-[1440px] mx-auto">
-          <div className="bg-z-ink text-z-paper p-8 sm:p-16 border-2 border-z-border shadow-[12px_12px_0px_0px_var(--color-z-shadow)] flex flex-col md:flex-row items-center gap-8 md:gap-16">
+          <div className="text-center mb-14">
+            <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-z-muted font-bold mb-2">Simple Process</p>
+            <h2 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter text-z-ink">How It Works</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { step: '01', title: 'Browse', desc: 'Explore our curated collections or search for your favorites' },
+              { step: '02', title: 'Choose', desc: 'Pick your size, layout & print style — or upload your own image' },
+              { step: '03', title: 'Order', desc: 'Secure checkout with multiple payment options' },
+              { step: '04', title: 'Delivered', desc: 'Premium prints shipped safely to your doorstep' },
+            ].map((item) => (
+              <div key={item.step} className="text-center p-6 border-2 border-z-border hover:border-z-ink transition-colors group">
+                <span className="font-display font-black text-4xl text-z-ink/10 group-hover:text-z-ink/30 transition-colors">{item.step}</span>
+                <h3 className="font-display font-bold text-xl uppercase tracking-tighter text-z-ink mt-3 mb-2">{item.title}</h3>
+                <p className="text-[11px] font-mono text-z-muted uppercase leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Bestsellers — Grid */}
+      {sectionLimits.bestseller.enabled && bestsellers.length > 0 && (
+        <ProductMarquee items={bestsellers} title="Bestsellers" subtitle="Most Loved" link="/collection?status=Bestseller" />
+      )}
+
+      {/* New Arrivals */}
+      {sectionLimits.new_arrivals.enabled && newArrivals.length > 0 && (
+        <ProductMarquee items={newArrivals} title="New Arrivals" subtitle="Just Dropped" link="/collection?status=New Arrival" />
+      )}
+
+      {/* Custom Print CTA */}
+      <section className="py-16 sm:py-24 px-6">
+        <div className="max-w-[1440px] mx-auto">
+          <div className="bg-z-ink text-z-paper p-8 sm:p-16 flex flex-col md:flex-row items-center gap-8 md:gap-16">
             <div className="flex-1">
-              <p className="text-[11px] font-mono uppercase tracking-[0.4em] text-z-paper/50 mb-4">Custom Print Studio</p>
-              <h2 className="font-display font-black text-4xl sm:text-6xl uppercase tracking-tighter leading-[0.85] mb-6">
-                Design Your<br/>Own <span className="text-outline">Prints</span>
+              <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-z-paper/50 mb-4">Custom Print Studio</p>
+              <h2 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter leading-[0.9] mb-6">
+                Your Image.<br/>Our Print.
               </h2>
-              <p className="font-mono text-[13px] text-z-paper/70 uppercase leading-relaxed mb-8 max-w-md">
-                Upload any image. Choose your size, layout & style. Available in A3, A4, A5, A6, Polaroid & Pocket sizes. We print and ship it to your door.
+              <p className="font-mono text-[12px] text-z-paper/70 uppercase leading-relaxed mb-8 max-w-md">
+                Upload any image and we'll print it on premium 300 GSM matte paper. Available in A3, A4, A5, A6, Polaroid & Pocket sizes with single or multi-panel layouts.
               </p>
-              <Link to="/customize" className="inline-block bg-z-paper text-z-ink px-8 py-4 font-display font-bold uppercase tracking-widest border-2 border-z-paper hover:bg-transparent hover:text-z-paper transition-all">
+              <Link to="/customize" className="inline-block bg-white text-z-ink px-8 py-3 font-mono text-[12px] font-bold uppercase tracking-widest hover:bg-white/90 transition-colors">
                 Start Creating →
               </Link>
             </div>
-            <div className="flex gap-2 shrink-0 items-end">
-              <div className="w-28 sm:w-36 aspect-[210/297] bg-z-paper/10 border-2 border-z-paper/30 flex items-center justify-center">
-                <span className="font-display font-black text-2xl sm:text-3xl text-z-paper/30">A3</span>
+            <div className="flex gap-3 shrink-0 items-end">
+              <div className="w-20 sm:w-28 aspect-[210/297] bg-white/10 border border-white/20 flex items-center justify-center">
+                <span className="font-display font-black text-xl text-white/20">A3</span>
               </div>
-              <div className="w-24 sm:w-30 aspect-[210/297] bg-z-paper/10 border-2 border-z-paper/30 flex items-center justify-center">
-                <span className="font-display font-black text-xl sm:text-2xl text-z-paper/30">A4</span>
+              <div className="w-16 sm:w-24 aspect-[210/297] bg-white/10 border border-white/20 flex items-center justify-center">
+                <span className="font-display font-black text-lg text-white/20">A4</span>
               </div>
-              <div className="w-20 sm:w-24 aspect-[210/297] bg-z-paper/10 border-2 border-z-paper/30 flex items-center justify-center">
-                <span className="font-display font-black text-lg sm:text-xl text-z-paper/30">A5</span>
+              <div className="w-14 sm:w-20 aspect-[210/297] bg-white/10 border border-white/20 flex items-center justify-center">
+                <span className="font-display font-black text-base text-white/20">A5</span>
               </div>
-              <div className="w-16 sm:w-20 aspect-[210/297] bg-z-paper/10 border-2 border-z-paper/30 flex items-center justify-center">
-                <span className="font-display font-black text-sm sm:text-base text-z-paper/30">A6</span>
-              </div>
-              <div className="w-14 sm:w-16 aspect-[3/4] bg-z-paper/10 border-2 border-z-paper/30 flex items-center justify-center">
-                <span className="font-display font-black text-[9px] sm:text-[10px] text-z-paper/30">Polaroid</span>
-              </div>
-              <div className="w-12 sm:w-14 aspect-[54/86] bg-z-paper/10 border-2 border-z-paper/30 flex items-center justify-center">
-                <span className="font-display font-black text-[8px] sm:text-[9px] text-z-paper/30">Pocket</span>
+              <div className="w-12 sm:w-16 aspect-[210/297] bg-white/10 border border-white/20 flex items-center justify-center">
+                <span className="font-display font-black text-sm text-white/20">A6</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* New Arrivals */}
-      {sectionLimits.new_arrivals.enabled && newArrivals.length > 0 && (
-        <MarqueeSection items={newArrivals} label="#NEW_ARRIVALS" title="New Arrivals" statusLink="New Arrival" />
-      )}
-
-      {/* Trending */}
+      {/* Trending — Grid */}
       {sectionLimits.trending.enabled && trending.length > 0 && (
-        <MarqueeSection items={trending} label="#TRENDING_NOW" title="Trending" statusLink="Trending" />
-      )}
-
-      {/* Bestsellers */}
-      {sectionLimits.bestseller.enabled && bestsellers.length > 0 && (
-        <MarqueeSection items={bestsellers} label="#BEST_SELLERS" title="Bestsellers" statusLink="Bestseller" />
+        <ProductMarquee items={trending} title="Trending Now" subtitle="Popular Picks" link="/collection?status=Trending" />
       )}
 
       {/* Featured */}
       {sectionLimits.featured.enabled && featured.length > 0 && (
-        <MarqueeSection items={featured} label="#FEATURED" title="Featured" statusLink="Featured" />
+        <ProductMarquee items={featured} title="Staff Picks" subtitle="Curated For You" link="/collection?status=Featured" />
       )}
 
-      {/* About / Philosophy */}
-      <section className="max-w-7xl mx-auto px-6 py-20 sm:py-32 overflow-hidden">
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-16 xl:gap-24 items-center">
-          <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-            <div className="bg-z-ink text-white px-4 py-2 font-mono text-[11px] sm:text-[13px] mb-8 font-bold inline-block uppercase tracking-widest">
-              PHILOSOPHY.001
-            </div>
-            <h2 className="font-display font-black text-4xl sm:text-5xl md:text-7xl uppercase tracking-tighter mb-8 sm:mb-12 leading-[0.85]">Posters<br/>that curate<br/><span className="text-outline">SPACE.</span></h2>
-            <div className="space-y-6 text-z-muted leading-relaxed font-bold font-mono text-sm uppercase border-l-4 border-z-border pl-6">
-              <p>[01] Wall art is the most impactful way to define the atmosphere of your environment.</p>
-              <p>[02] Every print is curated to be a unique statement piece for your space.</p>
-            </div>
-            <Link to="/story" className="sticker-btn bg-z-ink text-white mt-12 inline-block">Our Story →</Link>
-          </motion.div>
-          <div className="relative pt-10 pl-10">
-            <div className="absolute top-0 left-0 w-full h-full bg-z-ink z-0 border-2 border-z-border" />
-            <div className="polaroid relative z-10">
-              <div className="tape top-0 left-1/4" />
-              <motion.div initial={{ opacity: 0, scale: 1.1 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 1.5 }} className="aspect-[210/297] overflow-hidden">
-                {aboutImage ? (
-                  <img src={aboutImage} alt="Aesthetic space" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-z-border/20 flex items-center justify-center">
-                    <span className="text-[11px] font-mono text-z-ink/40 uppercase">No image set</span>
-                  </div>
-                )}
-              </motion.div>
-            </div>
+      {/* About */}
+      <section className="py-20 sm:py-32 px-6 bg-gray-50">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+              <p className="text-[11px] font-mono uppercase tracking-[0.3em] text-z-muted font-bold mb-4">About Us</p>
+              <h2 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter text-z-ink leading-[0.9] mb-6">
+                Posters That<br/>Define Your Space
+              </h2>
+              <div className="space-y-4 text-[13px] font-mono text-z-muted leading-relaxed">
+                <p>We believe your walls should reflect who you are. Every poster in our collection is carefully curated — from anime and movies to minimalist art and typography.</p>
+                <p>Printed on premium 300 GSM matte paper with vibrant, fade-resistant inks. Available in 6 sizes and multiple panel layouts.</p>
+              </div>
+              <Link to="/story" className="inline-block mt-8 px-8 py-3 border-2 border-z-ink text-z-ink font-mono text-[12px] font-bold uppercase tracking-widest hover:bg-z-ink hover:text-white transition-all">
+                Read Our Story
+              </Link>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="aspect-[4/5] overflow-hidden border-2 border-z-border">
+              {aboutImage ? (
+                <img src={aboutImage} alt="About Poster Theory" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-z-border/10 flex items-center justify-center">
+                  <span className="text-[11px] font-mono text-z-ink/30 uppercase">About Image</span>
+                </div>
+              )}
+            </motion.div>
           </div>
         </div>
       </section>
-
     </div>
   );
 }

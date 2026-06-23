@@ -105,34 +105,54 @@ export default function HomepageTab({ token }: { token: string | null }) {
   };
 
   const renderImageSection = (c: any) => {
-    if (c.section === 'hero_images' && c.data?.images) {
+    if (c.section === 'hero_images') {
+      const images = c.data?.images || [];
       return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
-          {c.data.images.map((img: any, idx: number) => (
-            <div key={idx} className="border border-z-border/30 p-2">
-              <div className="aspect-[210/297] bg-gray-100 dark:bg-z-ink/10 mb-2 flex items-center justify-center overflow-hidden">
-                {img.url ? <img src={img.url} alt="" className="w-full h-full object-cover" /> : <Image className="w-6 h-6 text-z-ink/20" />}
+        <div className="mt-3">
+          <p className="text-[9px] font-mono text-z-muted mb-3 uppercase">These images rotate in the hero carousel on the homepage.</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {images.map((img: any, idx: number) => (
+              <div key={idx} className="border border-z-border/30 p-2">
+                <div className="aspect-[3/4] bg-gray-100 dark:bg-z-ink/10 mb-2 flex items-center justify-center overflow-hidden">
+                  {img.url ? <img src={img.url} alt="" className="w-full h-full object-cover" /> : <Image className="w-6 h-6 text-z-ink/20" />}
+                </div>
+                <p className="text-[8px] font-mono text-z-muted truncate mb-1">{img.ref || `Slide ${idx + 1}`}</p>
+                <button onClick={() => triggerUpload(c.section, 'images', idx)} disabled={uploading}
+                  className="w-full px-2 py-1 bg-z-ink text-z-paper text-[8px] font-mono font-black uppercase hover:opacity-80 transition-all disabled:opacity-40 flex items-center justify-center gap-1">
+                  <Upload className="w-2.5 h-2.5" /> Replace
+                </button>
               </div>
-              <p className="text-[8px] font-mono text-z-muted truncate mb-1">{img.ref}</p>
-              <button onClick={() => triggerUpload(c.section, 'images', idx)} disabled={uploading}
-                className="w-full px-2 py-1 bg-z-ink text-z-paper text-[8px] font-mono font-black uppercase hover:opacity-80 transition-all disabled:opacity-40 flex items-center justify-center gap-1">
-                <Upload className="w-2.5 h-2.5" /> Replace
-              </button>
+            ))}
+            {/* Add new slide */}
+            <div className="border-2 border-dashed border-z-border/30 p-2 flex flex-col items-center justify-center cursor-pointer hover:border-z-orange transition-colors"
+              onClick={async () => {
+                const newImages = [...images, { url: '', ref: `Slide ${images.length + 1}` }];
+                const newData = { ...c.data, images: newImages };
+                await api.put('/api/admin/homepage', { section: 'hero_images', data: newData }, h(token));
+                setConfig(prev => prev.map(cc => cc.section === 'hero_images' ? { ...cc, data: newData } : prev.find(x => x.section === 'hero_images') ? cc : cc).concat(prev.find(x => x.section === 'hero_images') ? [] : [{ section: 'hero_images', data: newData }]));
+                setConfig(prev => {
+                  const exists = prev.find(cc => cc.section === 'hero_images');
+                  if (exists) return prev.map(cc => cc.section === 'hero_images' ? { ...cc, data: newData } : cc);
+                  return [...prev, { section: 'hero_images', data: newData }];
+                });
+              }}>
+              <Image className="w-6 h-6 text-z-ink/20 mb-2" />
+              <span className="text-[8px] font-mono font-black text-z-muted uppercase">+ Add Slide</span>
             </div>
-          ))}
+          </div>
         </div>
       );
     }
 
     if (c.section === 'collection_images') {
-      // Merge DB collections with saved images from config
       const savedCats: any[] = c.data?.collections || [];
       const mergedCats = dbCollections.map(dbCat => {
         const saved = savedCats.find((s: any) => s.name === dbCat.name);
-        return { name: dbCat.name, img: saved?.img || '', path: `/collection?category=${dbCat.name}` };
+        return { name: dbCat.name, img: saved?.img || '', path: `/collection?collection=${dbCat.name}` };
       });
       return (
         <div className="mt-3">
+          <p className="text-[9px] font-mono text-z-muted mb-3 uppercase">These images show in the Collections marquee on the homepage. Aspect ratio 3:4 works best.</p>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4">
             {mergedCats.map((cat: any, idx: number) => (
               <div key={idx} className="flex flex-col items-center">
@@ -168,14 +188,17 @@ export default function HomepageTab({ token }: { token: string | null }) {
 
     if (c.section === 'about_image') {
       return (
-        <div className="mt-3 flex items-center gap-4">
-          <div className="w-full max-w-[10rem] aspect-[210/297] bg-gray-100 dark:bg-z-ink/10 border-2 border-z-border flex items-center justify-center overflow-hidden">
-            {c.data?.url ? <img src={c.data.url} alt="" className="w-full h-full object-cover" /> : <Image className="w-6 h-6 text-z-ink/20" />}
+        <div className="mt-3">
+          <p className="text-[9px] font-mono text-z-muted mb-3 uppercase">This image appears in the "About Us" section near the bottom of the homepage. Portrait ratio recommended.</p>
+          <div className="flex items-center gap-4">
+            <div className="w-full max-w-[10rem] aspect-[3/4] bg-gray-100 dark:bg-z-ink/10 border-2 border-z-border flex items-center justify-center overflow-hidden">
+              {c.data?.url ? <img src={c.data.url} alt="" className="w-full h-full object-cover" /> : <Image className="w-6 h-6 text-z-ink/20" />}
+            </div>
+            <button onClick={() => triggerUpload(c.section, 'url')} disabled={uploading}
+              className="px-3 py-1.5 bg-z-ink text-z-paper text-[9px] font-mono font-black uppercase hover:opacity-80 transition-all disabled:opacity-40 flex items-center gap-1">
+              <Upload className="w-3 h-3" /> {c.data?.url ? 'Replace' : 'Upload'}
+            </button>
           </div>
-          <button onClick={() => triggerUpload(c.section, 'url')} disabled={uploading}
-            className="px-3 py-1.5 bg-z-ink text-z-paper text-[9px] font-mono font-black uppercase hover:opacity-80 transition-all disabled:opacity-40 flex items-center gap-1">
-            <Upload className="w-3 h-3" /> {c.data?.url ? 'Replace' : 'Upload'}
-          </button>
         </div>
       );
     }
