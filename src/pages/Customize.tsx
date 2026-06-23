@@ -38,9 +38,9 @@ export default function Customize() {
   const [canvasScale, setCanvasScale] = useState(1);
   useEffect(() => {
     const updateScale = () => {
-      const available = window.innerWidth - 32; // px-4 = 16px each side
+      const available = Math.min(window.innerWidth - 32, 1200);
       const needed = dims.width + 40;
-      setCanvasScale(Math.min(1, available / needed));
+      setCanvasScale(needed > available ? available / needed : 1);
     };
     updateScale();
     window.addEventListener('resize', updateScale);
@@ -324,7 +324,7 @@ export default function Customize() {
 
               {/* CENTER - Canvas */}
               <div className="lg:col-span-8 flex flex-col items-center">
-                <div className="text-[12px] font-mono font-black uppercase tracking-widest text-z-ink mb-3">
+                <div className="text-[10px] sm:text-[12px] font-mono font-black uppercase tracking-widest text-z-ink mb-3 truncate max-w-full">
                   {activePage.size} {activePage.orientation}
                   {` \u00b7 ${activePage.layout} (${activePage.panelCount} sheets)`}
                   {' \u2014 '}
@@ -335,8 +335,8 @@ export default function Customize() {
                   {paperMm.w}&times;{paperMm.h} mm per sheet
                 </div>
 
-                <div className="bg-gray-200 flex items-center justify-center p-2 sm:p-5 transition-all relative w-full"
-                  style={{ width: `${(dims.width + 40) * canvasScale}px`, height: `${(dims.height + 40) * canvasScale}px` }}
+                <div className="bg-gray-200 flex items-center justify-center p-2 sm:p-5 transition-all relative overflow-hidden"
+                  style={{ maxWidth: '100%', height: (dims.height + 40) * canvasScale }}
                   onDragOver={(e) => {
                     if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.stopPropagation(); }
                   }}
@@ -351,7 +351,7 @@ export default function Customize() {
                   </div>
                 </div>
 
-                <div className="w-full mt-3 flex items-center justify-between px-1">
+                <div className="w-full mt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between px-1 gap-2">
                   {imageDims ? (
                     <span className="text-[11px] font-mono font-bold uppercase text-z-ink/70 dark:text-z-ink/80">
                       Placed: {imageDims.placedW} &times; {imageDims.placedH} mm{imageDims.rotation !== 0 && ` \u00b7 ${imageDims.rotation}\u00b0`}
@@ -409,7 +409,7 @@ export default function Customize() {
 
               {/* CENTER */}
               <div className="lg:col-span-6 flex flex-col items-center">
-                <div className="text-[12px] font-mono font-black uppercase tracking-widest text-z-ink mb-3">
+                <div className="text-[10px] sm:text-[12px] font-mono font-black uppercase tracking-widest text-z-ink mb-3 truncate max-w-full">
                   {activePage.size} {activePage.orientation}
                   {' \u2014 '}
                   {paperMm.w} &times; {paperMm.h} mm
@@ -420,8 +420,8 @@ export default function Customize() {
                   )}
                 </div>
 
-                <div className="bg-gray-200 flex items-center justify-center p-2 sm:p-5 transition-all relative w-full"
-                  style={{ width: `${(dims.width + 40) * canvasScale}px`, height: `${(dims.height + 40) * canvasScale}px` }}
+                <div className="bg-gray-200 flex items-center justify-center p-2 sm:p-5 transition-all relative overflow-hidden"
+                  style={{ maxWidth: '100%', height: (dims.height + 40) * canvasScale }}
                   onDragOver={(e) => {
                     if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.stopPropagation(); }
                   }}
@@ -436,7 +436,7 @@ export default function Customize() {
                   </div>
                 </div>
 
-                <div className="w-full mt-3 flex items-center justify-between px-1">
+                <div className="w-full mt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between px-1 gap-2">
                   {imageDims ? (
                     <span className="text-[11px] font-mono font-bold uppercase text-z-ink/70 dark:text-z-ink/80">
                       Placed: {imageDims.placedW} &times; {imageDims.placedH} mm{imageDims.rotation !== 0 && ` \u00b7 ${imageDims.rotation}\u00b0`}
