@@ -71,8 +71,8 @@ export default function Home() {
           View All →
         </Link>
       </div>
-      <div className="group">
-        <div className="flex gap-6 animate-marquee-scroll hover:[animation-play-state:paused] md:[animation-play-state:running] [animation-play-state:paused] md:animate-marquee-scroll overflow-x-auto md:overflow-visible scrollbar-hide px-6 md:px-0">
+      <div className="group pb-4">
+        <div className="flex gap-6 animate-marquee-scroll hover:[animation-play-state:paused] md:[animation-play-state:running] [animation-play-state:paused] md:animate-marquee-scroll overflow-x-auto md:overflow-visible scrollbar-hide px-6 md:px-0 items-stretch">
           {[...items, ...items].map((p: any, idx: number) => (
             <div key={`${p.id}-${idx}`} className="w-36 sm:w-48 md:w-56 shrink-0">
               <ProductCard {...p} />
@@ -130,13 +130,13 @@ export default function Home() {
               <h2 className="font-display font-black text-3xl sm:text-5xl uppercase tracking-tighter text-z-ink">Collections</h2>
             </div>
           </div>
-          <div className="group">
-            <div className="flex gap-6 animate-marquee-scroll hover:[animation-play-state:paused] md:[animation-play-state:running] [animation-play-state:paused] md:animate-marquee-scroll overflow-x-auto md:overflow-visible scrollbar-hide px-6 md:px-0">
+          <div className="group pb-4">
+            <div className="flex gap-6 animate-marquee-scroll hover:[animation-play-state:paused] md:[animation-play-state:running] [animation-play-state:paused] md:animate-marquee-scroll overflow-x-auto md:overflow-visible scrollbar-hide px-6 md:px-0 items-stretch">
               {[...collections, ...collections].map((cat, idx) => (
                 <Link key={idx} to={cat.path} className="shrink-0 group/card flex flex-col items-center">
                   <div className="w-36 sm:w-48 md:w-56 aspect-[3/4] overflow-hidden border-2 border-z-border group-hover/card:border-z-ink transition-all relative">
                     {cat.img ? (
-                      <img src={cat.img} alt={cat.name} loading="lazy" className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" />
+                      <img src={cat.img} alt={cat.name} loading="eager" className="w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" />
                     ) : (
                       <div className="w-full h-full bg-z-border/10 flex items-center justify-center">
                         <span className="font-display font-black text-4xl text-z-ink/10 uppercase">{cat.name[0]}</span>

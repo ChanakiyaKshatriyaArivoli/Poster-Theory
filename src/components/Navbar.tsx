@@ -117,7 +117,6 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Collections', path: '/collection' },
     { name: 'Customize', path: '/customize' },
-    { name: 'The Story', path: '/story' },
   ];
 
   // Close menus on click outside
@@ -190,12 +189,7 @@ export default function Navbar() {
             >
               Customize
             </Link>
-            <Link
-              to="/story"
-              className="hover:bg-z-ink hover:text-z-paper px-3 py-1 transition-all"
-            >
-              The Story
-            </Link>
+
           </div>
 
           {!hideSearch && (

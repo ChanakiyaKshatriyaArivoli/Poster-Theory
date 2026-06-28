@@ -47,6 +47,9 @@ export default function Customize() {
     return () => window.removeEventListener('resize', updateScale);
   }, [dims.width]);
 
+  const scaledWidth = (dims.width) * canvasScale;
+  const scaledHeight = (dims.height) * canvasScale;
+
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) editor.handleImageUpload(file);
@@ -336,7 +339,7 @@ export default function Customize() {
                 </div>
 
                 <div className="bg-gray-200 flex items-center justify-center p-2 sm:p-5 transition-all relative overflow-hidden"
-                  style={{ maxWidth: '100%', height: (dims.height + 40) * canvasScale }}
+                  style={{ maxWidth: '100%', minHeight: scaledHeight + 16 }}
                   onDragOver={(e) => {
                     if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.stopPropagation(); }
                   }}
@@ -346,8 +349,10 @@ export default function Customize() {
                     const file = e.dataTransfer.files[0];
                     if (file && file.type.startsWith('image/')) editor.handleImageUpload(file);
                   }}>
-                  <div className="shadow-[0_2px_16px_rgba(0,0,0,0.12)]" style={{ transform: `scale(${canvasScale})`, transformOrigin: 'top left' }}>
-                    <canvas ref={canvasElRef} />
+                  <div style={{ width: scaledWidth, height: scaledHeight, overflow: 'hidden' }}>
+                    <div className="shadow-[0_2px_16px_rgba(0,0,0,0.12)]" style={{ transform: `scale(${canvasScale})`, transformOrigin: 'top left' }}>
+                      <canvas ref={canvasElRef} />
+                    </div>
                   </div>
                 </div>
 
@@ -421,7 +426,7 @@ export default function Customize() {
                 </div>
 
                 <div className="bg-gray-200 flex items-center justify-center p-2 sm:p-5 transition-all relative overflow-hidden"
-                  style={{ maxWidth: '100%', height: (dims.height + 40) * canvasScale }}
+                  style={{ maxWidth: '100%', minHeight: scaledHeight + 16 }}
                   onDragOver={(e) => {
                     if (e.dataTransfer.types.includes('Files')) { e.preventDefault(); e.stopPropagation(); }
                   }}
@@ -431,8 +436,10 @@ export default function Customize() {
                     const file = e.dataTransfer.files[0];
                     if (file && file.type.startsWith('image/')) editor.handleImageUpload(file);
                   }}>
-                  <div className="shadow-[0_2px_16px_rgba(0,0,0,0.12)]" style={{ transform: `scale(${canvasScale})`, transformOrigin: 'top left' }}>
-                    <canvas ref={canvasElRef} />
+                  <div style={{ width: scaledWidth, height: scaledHeight, overflow: 'hidden' }}>
+                    <div className="shadow-[0_2px_16px_rgba(0,0,0,0.12)]" style={{ transform: `scale(${canvasScale})`, transformOrigin: 'top left' }}>
+                      <canvas ref={canvasElRef} />
+                    </div>
                   </div>
                 </div>
 

@@ -28,7 +28,7 @@ export default function SettingsPanel({ activePage, paperSizes, layouts, portrai
   const isPortraitOnly = portraitOnly.includes(activePage.size);
 
   return (
-    <div className="bg-z-paper border-2 border-z-border p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)]">
+    <div className="bg-z-paper border-2 border-z-border p-3 sm:p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.1)] overflow-hidden">
       <h4 className="text-[12px] font-mono font-black uppercase tracking-widest text-z-ink dark:text-z-ink mb-4 pb-2 border-b border-z-border">Settings</h4>
 
       <div className="mb-5">
@@ -46,11 +46,11 @@ export default function SettingsPanel({ activePage, paperSizes, layouts, portrai
         ) : (
           <div className="grid grid-cols-2 gap-2">
             <button onClick={() => { if (activePage.orientation !== 'portrait') onToggleOrientation(); }}
-              className={`py-2.5 text-[12px] font-mono font-black uppercase border-2 transition-all active:scale-95 ${activePage.orientation === 'portrait' ? 'bg-z-ink text-z-paper border-z-ink' : 'bg-z-paper text-z-ink border-z-border hover:border-z-ink'}`}>
+              className={`py-2.5 text-[10px] sm:text-[12px] font-mono font-black uppercase border-2 transition-all active:scale-95 truncate ${activePage.orientation === 'portrait' ? 'bg-z-ink text-z-paper border-z-ink' : 'bg-z-paper text-z-ink border-z-border hover:border-z-ink'}`}>
               Portrait
             </button>
             <button onClick={() => { if (activePage.orientation !== 'landscape') onToggleOrientation(); }}
-              className={`py-2.5 text-[12px] font-mono font-black uppercase border-2 transition-all active:scale-95 ${activePage.orientation === 'landscape' ? 'bg-z-ink text-z-paper border-z-ink' : 'bg-z-paper text-z-ink border-z-border hover:border-z-ink'}`}>
+              className={`py-2.5 text-[10px] sm:text-[12px] font-mono font-black uppercase border-2 transition-all active:scale-95 truncate ${activePage.orientation === 'landscape' ? 'bg-z-ink text-z-paper border-z-ink' : 'bg-z-paper text-z-ink border-z-border hover:border-z-ink'}`}>
               Landscape
             </button>
           </div>
@@ -80,8 +80,8 @@ export default function SettingsPanel({ activePage, paperSizes, layouts, portrai
             const desc = l.panel_count === 1 ? '□' : l.panel_count === 2 ? '▌▐' : l.panel_count === 3 ? '▍▍▍' : l.panel_count === 4 ? '⊞' : l.panel_count === 9 ? '▦' : `${l.panel_count}P`;
             return (
               <button key={l.name} onClick={() => onChangeLayout(l.name, l.panel_count)}
-                className={`py-2.5 text-[11px] font-mono font-black uppercase border-2 transition-all active:scale-95 flex items-center justify-center gap-1.5 ${activePage.layout === l.name ? 'bg-z-ink text-z-paper border-z-ink' : 'bg-z-paper text-z-ink border-z-border hover:border-z-ink'}`}>
-                <span className="text-[14px]">{desc}</span> {l.name}
+                className={`py-2.5 text-[9px] sm:text-[11px] font-mono font-black uppercase border-2 transition-all active:scale-95 flex items-center justify-center gap-1 sm:gap-1.5 min-w-0 overflow-hidden ${activePage.layout === l.name ? 'bg-z-ink text-z-paper border-z-ink' : 'bg-z-paper text-z-ink border-z-border hover:border-z-ink'}`}>
+                <span className="text-[12px] sm:text-[14px] shrink-0">{desc}</span> <span className="truncate">{l.name}</span>
               </button>
             );
           })}
@@ -89,12 +89,12 @@ export default function SettingsPanel({ activePage, paperSizes, layouts, portrai
         {activePage.panelCount > 1 && activePage.panelCount < 4 && (
           <div className="grid grid-cols-2 gap-2 mt-3">
             <button onClick={() => onChangeSplitDirection('vertical')}
-              className={`py-2 text-[10px] font-mono font-black uppercase border-2 transition-all active:scale-95 flex items-center justify-center gap-1 ${activePage.splitDirection === 'vertical' ? 'bg-z-ink text-z-paper border-z-ink' : 'bg-z-paper text-z-ink border-z-border hover:border-z-ink'}`}>
-              <span className="text-[13px]">│</span> Vertical
+              className={`py-2 text-[9px] sm:text-[10px] font-mono font-black uppercase border-2 transition-all active:scale-95 flex items-center justify-center gap-1 min-w-0 overflow-hidden ${activePage.splitDirection === 'vertical' ? 'bg-z-ink text-z-paper border-z-ink' : 'bg-z-paper text-z-ink border-z-border hover:border-z-ink'}`}>
+              <span className="text-[13px] shrink-0">│</span> <span className="truncate">Vertical</span>
             </button>
             <button onClick={() => onChangeSplitDirection('horizontal')}
-              className={`py-2 text-[10px] font-mono font-black uppercase border-2 transition-all active:scale-95 flex items-center justify-center gap-1 ${activePage.splitDirection === 'horizontal' ? 'bg-z-ink text-z-paper border-z-ink' : 'bg-z-paper text-z-ink border-z-border hover:border-z-ink'}`}>
-              <span className="text-[13px]">─</span> Horizontal
+              className={`py-2 text-[9px] sm:text-[10px] font-mono font-black uppercase border-2 transition-all active:scale-95 flex items-center justify-center gap-1 min-w-0 overflow-hidden ${activePage.splitDirection === 'horizontal' ? 'bg-z-ink text-z-paper border-z-ink' : 'bg-z-paper text-z-ink border-z-border hover:border-z-ink'}`}>
+              <span className="text-[13px] shrink-0">─</span> <span className="truncate">Horizontal</span>
             </button>
           </div>
         )}
@@ -106,8 +106,8 @@ export default function SettingsPanel({ activePage, paperSizes, layouts, portrai
       </div>
       )}
 
-      <label className="w-full h-11 bg-z-ink text-z-paper text-[12px] font-mono font-black uppercase border-2 border-z-ink cursor-pointer flex items-center justify-center gap-2 hover:opacity-80 transition-opacity active:scale-95">
-        <Upload className="w-4 h-4" /> {activePage.hasImage ? 'Replace Image' : 'Upload or Drag & Drop'}
+      <label className="w-full h-11 bg-z-ink text-z-paper text-[10px] sm:text-[12px] font-mono font-black uppercase border-2 border-z-ink cursor-pointer flex items-center justify-center gap-2 hover:opacity-80 transition-opacity active:scale-95 overflow-hidden">
+        <Upload className="w-4 h-4 shrink-0" /> <span className="truncate">{activePage.hasImage ? 'Replace Image' : 'Upload or Drag & Drop'}</span>
         <input ref={fileInputRef} type="file" accept="image/*" onChange={onUpload} className="hidden" />
       </label>
 
